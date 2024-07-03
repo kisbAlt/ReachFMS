@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/SimConnector/.vs
+/SimConnector/SimConnector/bin
+/SimConnector/SimConnector/obj

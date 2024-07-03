@@ -1,0 +1,18 @@
+replace:
+inkscape:label="BTN:
+
+to:
+
+onclick="buttonPressed()" class="BTN" inkscape:label="BTN:
+
+
+<style>
+    .BTN > rect {
+        cursor: pointer
+
+    }
+    .BTN {
+        cursor: pointer
+    }
+    text {user-select: none}
+</style>
