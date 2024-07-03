@@ -1,15 +1,12 @@
 use std::io::{BufWriter, Cursor};
-use std::{mem, thread};
-use std::path::Path;
-use image::{DynamicImage, ImageBuffer, ImageFormat, Luma, RgbaImage};
+use std::{mem};
+use image::{ImageFormat, Luma, RgbaImage};
 use win_screenshot::prelude::*;
 use serde::{Deserialize, Serialize};
-use template_matching::{find_extremes, match_template, MatchTemplateMethod};
 use windows::{
     Win32::Foundation::*,
     Win32::UI::WindowsAndMessaging::*,
 };
-use crate::api_communicator;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct InstrumentRgb {
