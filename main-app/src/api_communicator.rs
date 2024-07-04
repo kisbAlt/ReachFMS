@@ -1,5 +1,6 @@
 use std::os::windows::process::CommandExt;
 use std::process::{Child, Command};
+use crate::config_handler::get_simconnector_exe;
 use crate::http_streamer::BridgeStatus;
 
 const LOCALHOST_PORT: &str = "5273";
@@ -22,16 +23,7 @@ pub fn check_bridge_process() -> bool {
 
 pub fn start_bridge_process() -> Child {
 
-    let connector_path: String = match std::env::current_exe() {
-        Ok(mut res) => {
-            res.pop();
-            res.push("SimConnector.exe");
-            res.into_os_string().into_string().unwrap_or("SimConnector.exe".to_string())
-        }
-        Err(_) => {
-            "SimConnector.exe".to_string()
-        }
-    };
+    let connector_path: String = get_simconnector_exe();
     println!("starting app...: {}", &connector_path);
     
     let mut child = Command::new(connector_path)

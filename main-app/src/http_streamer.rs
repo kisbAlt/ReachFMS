@@ -14,10 +14,10 @@ use qstring::QString;
 use std::time::{Instant};
 use actix_files::Files;
 use crossbeam_channel::{bounded, select, after};
-use crate::config_handler::{ConfigHandler, DebugSave};
+use crate::config_handler::{ConfigHandler, DebugSave, get_static_folder};
 use crate::image_process::InstrumentRgb;
 use serde::{Deserialize, Serialize};
-
+use crate::addon_config::AddonConfig;
 
 #[derive(Serialize, Deserialize)]
 struct StatusResponse {
@@ -131,7 +131,7 @@ async fn stop_server(data: web::Data<AppState>) -> impl Responder {
                 unsafe { ImageProcess::move_window(wn, 0, 0, 700, 700) }
             }
         }
-        data.command_sender.send("CloseBridge".to_string());
+        data.command_sender.send("CloseBridge".to_string()).expect("cannot send CloseBridge");
 
         // std::thread::spawn(move || {
         //     api_communicator::stop_bridge_process()
@@ -721,18 +721,11 @@ pub async fn main() -> std::io::Result<()> {
             comm: false
         }),
     });
-    let static_path: String = match std::env::current_exe() {
-        Ok(mut res) => {
-            res.pop();
-            res.push("static");
-            res.into_os_string().into_string().unwrap_or("static".to_string())
-            
-        }
-        Err(_) => {
-            "static".to_string()
-        }
-    };
-    println!("Static path: {}", &static_path);
+    let static_path: String = get_static_folder();
+    
+    
+    
+    
     HttpServer::new(move || {
         let cors = Cors::permissive();
         App::new()

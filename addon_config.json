@@ -1,0 +1,1135 @@
+{
+  "aircraft_addons": [
+    {
+      "title": "a310",
+      "button_actions": [
+        {
+          "button": "LSK5",
+          "lvar": "A310_MCDU1_LSK5L"
+        },
+        {
+          "button": "LSK6",
+          "lvar": "A310_MCDU1_LSK6L"
+        },
+        {
+          "button": "LSK1",
+          "lvar": "A310_MCDU1_LSK1L"
+        },
+        {
+          "button": "LSK2",
+          "lvar": "A310_MCDU1_LSK2L"
+        },
+        {
+          "button": "LSK3",
+          "lvar": "A310_MCDU1_LSK3L"
+        },
+        {
+          "button": "LSK4",
+          "lvar": "A310_MCDU1_LSK4L"
+        },
+        {
+          "button": "RSK5",
+          "lvar": "A310_MCDU1_LSK5R"
+        },
+        {
+          "button": "RSK6",
+          "lvar": "A310_MCDU1_LSK6R"
+        },
+        {
+          "button": "RSK1",
+          "lvar": "A310_MCDU1_LSK1R"
+        },
+        {
+          "button": "RSK2",
+          "lvar": "A310_MCDU1_LSK2R"
+        },
+        {
+          "button": "RSK3",
+          "lvar": "A310_MCDU1_LSK3R"
+        },
+        {
+          "button": "RSK4",
+          "lvar": "A310_MCDU1_LSK4R"
+        },
+        {
+          "button": "DIR",
+          "lvar": "A310_MCDU1_DIR_TO"
+        },
+        {
+          "button": "MODE",
+          "lvar": "A310_MCDU1_MODE"
+        },
+        {
+          "button": "TACT_MODE",
+          "lvar": "A310_MCDU1_TACT_MODE"
+        },
+        {
+          "button": "INIT",
+          "lvar": "A310_MCDU1_INIT"
+        },
+        {
+          "button": "REF",
+          "lvar": "A310_MCDU1_REF"
+        },
+        {
+          "button": "F_PLN",
+          "lvar": "A310_MCDU1_FPLAN"
+        },
+        {
+          "button": "T/O_APPR",
+          "lvar": "A310_MCDU1_TO_APPR"
+        },
+        {
+          "button": "SEC_F_PLN",
+          "lvar": "A310_MCDU1_SEC_PLAN"
+        },
+        {
+          "button": "MENU",
+          "lvar": "A310_MCDU1_MENU"
+        },
+        {
+          "button": "PROG",
+          "lvar": "A310_MCDU1_PROG"
+        },
+        {
+          "button": "ARROW_UP",
+          "lvar": "A310_MCDU1_UARROW"
+        },
+        {
+          "button": "ARROW_DOWN",
+          "lvar": "A310_MCDU1_DOWN"
+        },
+        {
+          "button": "NEXT_PAGE",
+          "lvar": "A310_MCDU1_NEXT"
+        },
+        {
+          "button": "ARROW_DOWN",
+          "lvar": "A310_MCDU1_DARROW"
+        },
+        {
+          "button": "A",
+          "lvar": "A310_MCDU1_A"
+        },
+        {
+          "button": "B",
+          "lvar": "A310_MCDU1_B"
+        },
+        {
+          "button": "C",
+          "lvar": "A310_MCDU1_C"
+        },
+        {
+          "button": "D",
+          "lvar": "A310_MCDU1_D"
+        },
+        {
+          "button": "E",
+          "lvar": "A310_MCDU1_E"
+        },
+        {
+          "button": "F",
+          "lvar": "A310_MCDU1_F"
+        },
+        {
+          "button": "G",
+          "lvar": "A310_MCDU1_G"
+        },
+        {
+          "button": "H",
+          "lvar": "A310_MCDU1_H"
+        },
+        {
+          "button": "I",
+          "lvar": "A310_MCDU1_I"
+        },
+        {
+          "button": "J",
+          "lvar": "A310_MCDU1_J"
+        },
+        {
+          "button": "K",
+          "lvar": "A310_MCDU1_K"
+        },
+        {
+          "button": "L",
+          "lvar": "A310_MCDU1_L"
+        },
+        {
+          "button": "M",
+          "lvar": "A310_MCDU1_M"
+        },
+        {
+          "button": "N",
+          "lvar": "A310_MCDU1_N"
+        },
+        {
+          "button": "O",
+          "lvar": "A310_MCDU1_O"
+        },
+        {
+          "button": "P",
+          "lvar": "A310_MCDU1_P"
+        },
+        {
+          "button": "Q",
+          "lvar": "A310_MCDU1_Q"
+        },
+        {
+          "button": "R",
+          "lvar": "A310_MCDU1_R"
+        },
+        {
+          "button": "S",
+          "lvar": "A310_MCDU1_S"
+        },
+        {
+          "button": "T",
+          "lvar": "A310_MCDU1_T"
+        },
+        {
+          "button": "U",
+          "lvar": "A310_MCDU1_U"
+        },
+        {
+          "button": "V",
+          "lvar": "A310_MCDU1_V"
+        },
+        {
+          "button": "W",
+          "lvar": "A310_MCDU1_W"
+        },
+        {
+          "button": "X",
+          "lvar": "A310_MCDU1_X"
+        },
+        {
+          "button": "Y",
+          "lvar": "A310_MCDU1_Y"
+        },
+        {
+          "button": "Z",
+          "lvar": "A310_MCDU1_Z"
+        },
+        {
+          "button": "-",
+          "lvar": "A310_MCDU1_MINUS"
+        },
+        {
+          "button": "+",
+          "lvar": "A310_MCDU1_PLUS"
+        },
+        {
+          "button": "SLAH",
+          "lvar": "A310_MCDU1_SLASH"
+        },
+        {
+          "button": "CLR",
+          "lvar": "A310_MCDU1_CLR"
+        },
+        {
+          "button": "1",
+          "lvar": "A310_MCDU1_1"
+        },
+        {
+          "button": "2",
+          "lvar": "A310_MCDU1_2"
+        },
+        {
+          "button": "3",
+          "lvar": "A310_MCDU1_3"
+        },
+        {
+          "button": "4",
+          "lvar": "A310_MCDU1_4"
+        },
+        {
+          "button": "5",
+          "lvar": "A310_MCDU1_5"
+        },
+        {
+          "button": "6",
+          "lvar": "A310_MCDU1_6"
+        },
+        {
+          "button": "7",
+          "lvar": "A310_MCDU1_7"
+        },
+        {
+          "button": "8",
+          "lvar": "A310_MCDU1_8"
+        },
+        {
+          "button": "9",
+          "lvar": "A310_MCDU1_9"
+        },
+        {
+          "button": "0",
+          "lvar": "A310_MCDU1_0"
+        },
+        {
+          "button": "DOT",
+          "lvar": "A310_MCDU1_DOT"
+        }
+      ],
+      "svg_image": "a310.svg",
+      "output_vars": []
+    },
+    {
+      "title": "A300",
+      "button_actions": [
+        {
+          "button": "LSK5",
+          "lvar": "INI_MCDU1_LSK5L"
+        },
+        {
+          "button": "LSK6",
+          "lvar": "INI_MCDU1_LSK6L"
+        },
+        {
+          "button": "LSK1",
+          "lvar": "INI_MCDU1_LSK1L"
+        },
+        {
+          "button": "LSK2",
+          "lvar": "INI_MCDU1_LSK2L"
+        },
+        {
+          "button": "LSK3",
+          "lvar": "INI_MCDU1_LSK3L"
+        },
+        {
+          "button": "LSK3",
+          "lvar": "INI_MCDU1_LSK4L"
+        },
+        {
+          "button": "RSK5",
+          "lvar": "INI_MCDU1_LSK5R"
+        },
+        {
+          "button": "RSK6",
+          "lvar": "INI_MCDU1_LSK6R"
+        },
+        {
+          "button": "RSK1",
+          "lvar": "INI_MCDU1_LSK1R"
+        },
+        {
+          "button": "RSK2",
+          "lvar": "INI_MCDU1_LSK2R"
+        },
+        {
+          "button": "RSK3",
+          "lvar": "INI_MCDU1_LSK3R"
+        },
+        {
+          "button": "RSK4",
+          "lvar": "INI_MCDU1_LSK4R"
+        },
+        {
+          "button": "DIR",
+          "lvar": "INI_MCDU1_DIR_TO"
+        },
+        {
+          "button": "MODE",
+          "lvar": "INI_MCDU1_MODE"
+        },
+        {
+          "button": "TACT_MODE",
+          "lvar": "INI_MCDU1_TACT_MODE"
+        },
+        {
+          "button": "INIT",
+          "lvar": "INI_MCDU1_INIT"
+        },
+        {
+          "button": "REF",
+          "lvar": "INI_MCDU1_REF"
+        },
+        {
+          "button": "F_PLN",
+          "lvar": "INI_MCDU1_FPLAN"
+        },
+        {
+          "button": "T/O_APPR",
+          "lvar": "INI_MCDU1_TO_APPR"
+        },
+        {
+          "button": "SEC_F_PLN",
+          "lvar": "INI_MCDU1_SEC_PLAN"
+        },
+        {
+          "button": "MENU",
+          "lvar": "INI_MCDU1_MENU"
+        },
+        {
+          "button": "PROG",
+          "lvar": "INI_MCDU1_PROG"
+        },
+        {
+          "button": "ARROW_UP",
+          "lvar": "INI_MCDU1_UARROW"
+        },
+        {
+          "button": "ARROW_DOWN",
+          "lvar": "INI_MCDU1_DOWN"
+        },
+        {
+          "button": "NEXT_PAGE",
+          "lvar": "INI_MCDU1_NEXT"
+        },
+        {
+          "button": "ARROW_DOWN",
+          "lvar": "INI_MCDU1_DARROW"
+        },
+        {
+          "button": "A",
+          "lvar": "INI_MCDU1_A"
+        },
+        {
+          "button": "B",
+          "lvar": "INI_MCDU1_B"
+        },
+        {
+          "button": "C",
+          "lvar": "INI_MCDU1_C"
+        },
+        {
+          "button": "D",
+          "lvar": "INI_MCDU1_D"
+        },
+        {
+          "button": "E",
+          "lvar": "INI_MCDU1_E"
+        },
+        {
+          "button": "F",
+          "lvar": "INI_MCDU1_F"
+        },
+        {
+          "button": "G",
+          "lvar": "INI_MCDU1_G"
+        },
+        {
+          "button": "H",
+          "lvar": "INI_MCDU1_H"
+        },
+        {
+          "button": "I",
+          "lvar": "INI_MCDU1_I"
+        },
+        {
+          "button": "J",
+          "lvar": "INI_MCDU1_J"
+        },
+        {
+          "button": "K",
+          "lvar": "INI_MCDU1_K"
+        },
+        {
+          "button": "L",
+          "lvar": "INI_MCDU1_L"
+        },
+        {
+          "button": "M",
+          "lvar": "INI_MCDU1_M"
+        },
+        {
+          "button": "N",
+          "lvar": "INI_MCDU1_N"
+        },
+        {
+          "button": "O",
+          "lvar": "INI_MCDU1_O"
+        },
+        {
+          "button": "P",
+          "lvar": "INI_MCDU1_P"
+        },
+        {
+          "button": "Q",
+          "lvar": "INI_MCDU1_Q"
+        },
+        {
+          "button": "R",
+          "lvar": "INI_MCDU1_R"
+        },
+        {
+          "button": "S",
+          "lvar": "INI_MCDU1_S"
+        },
+        {
+          "button": "T",
+          "lvar": "INI_MCDU1_T"
+        },
+        {
+          "button": "U",
+          "lvar": "INI_MCDU1_U"
+        },
+        {
+          "button": "V",
+          "lvar": "INI_MCDU1_V"
+        },
+        {
+          "button": "W",
+          "lvar": "INI_MCDU1_W"
+        },
+        {
+          "button": "X",
+          "lvar": "INI_MCDU1_X"
+        },
+        {
+          "button": "Y",
+          "lvar": "INI_MCDU1_Y"
+        },
+        {
+          "button": "Z",
+          "lvar": "INI_MCDU1_Z"
+        },
+        {
+          "button": "-",
+          "lvar": "INI_MCDU1_MINUS"
+        },
+        {
+          "button": "+",
+          "lvar": "INI_MCDU1_PLUS"
+        },
+        {
+          "button": "SLAH",
+          "lvar": "INI_MCDU1_SLASH"
+        },
+        {
+          "button": "CLR",
+          "lvar": "INI_MCDU1_CLR"
+        },
+        {
+          "button": "1",
+          "lvar": "INI_MCDU1_1"
+        },
+        {
+          "button": "2",
+          "lvar": "INI_MCDU1_2"
+        },
+        {
+          "button": "3",
+          "lvar": "INI_MCDU1_3"
+        },
+        {
+          "button": "4",
+          "lvar": "INI_MCDU1_4"
+        },
+        {
+          "button": "5",
+          "lvar": "INI_MCDU1_5"
+        },
+        {
+          "button": "6",
+          "lvar": "INI_MCDU1_6"
+        },
+        {
+          "button": "7",
+          "lvar": "INI_MCDU1_7"
+        },
+        {
+          "button": "8",
+          "lvar": "INI_MCDU1_8"
+        },
+        {
+          "button": "9",
+          "lvar": "INI_MCDU1_9"
+        },
+        {
+          "button": "0",
+          "lvar": "INI_MCDU1_0"
+        },
+        {
+          "button": "DOT",
+          "lvar": "INI_MCDU1_DOT"
+        }
+      ],
+      "svg_image": "a310.svg",
+      "output_vars": []
+    },
+    {
+      "title": "B737",
+      "button_actions": [
+        {
+          "button": "LSK1",
+          "lvar": "53401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LSK2",
+          "lvar": "53501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LSK3",
+          "lvar": "53601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LSK4",
+          "lvar": "53701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LSK5",
+          "lvar": "53801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LSK6",
+          "lvar": "53901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK1",
+          "lvar": "54001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK2",
+          "lvar": "54101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK3",
+          "lvar": "54201 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK4",
+          "lvar": "54301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK5",
+          "lvar": "54401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK6",
+          "lvar": "54501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "INIT_REF",
+          "lvar": "54601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RTE",
+          "lvar": "54701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "CLB",
+          "lvar": "54801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "CRZ",
+          "lvar": "54901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "DES",
+          "lvar": "55001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "BRT+",
+          "lvar": "60501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "BRT-",
+          "lvar": "60502 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "MENU",
+          "lvar": "55101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LEGS",
+          "lvar": "55201 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "DEP_ARR",
+          "lvar": "55301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "HOLD",
+          "lvar": "55401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "PROG",
+          "lvar": "55501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "EXEC",
+          "lvar": "55601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "N1 LIMIT",
+          "lvar": "55701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "FIX",
+          "lvar": "55801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "PREV_PAGE",
+          "lvar": "55901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "NEXT_PAGE",
+          "lvar": "56001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "A",
+          "lvar": "57301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "B",
+          "lvar": "57401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "C",
+          "lvar": "57501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "D",
+          "lvar": "57601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "E",
+          "lvar": "57701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "F",
+          "lvar": "57801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "G",
+          "lvar": "57901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "H",
+          "lvar": "58001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "I",
+          "lvar": "58101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "J",
+          "lvar": "58201 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "K",
+          "lvar": "58301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "L",
+          "lvar": "58401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "M",
+          "lvar": "58501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "N",
+          "lvar": "58601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "O",
+          "lvar": "58701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "P",
+          "lvar": "58801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "Q",
+          "lvar": "58901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "R",
+          "lvar": "59001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "S",
+          "lvar": "59101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "T",
+          "lvar": "59201 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "U",
+          "lvar": "59301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "V",
+          "lvar": "59401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "W",
+          "lvar": "59501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "X",
+          "lvar": "59601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "Y",
+          "lvar": "59701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "Z",
+          "lvar": "59801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "SP",
+          "lvar": "59901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "DEL",
+          "lvar": "60001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "SLASH",
+          "lvar": "60101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "CLR",
+          "lvar": "60201 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "CLR:REL",
+          "lvar": "60204 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "1",
+          "lvar": "56101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "2",
+          "lvar": "56201 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "3",
+          "lvar": "56301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "4",
+          "lvar": "56401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "5",
+          "lvar": "56501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "6",
+          "lvar": "56601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "7",
+          "lvar": "56701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "8",
+          "lvar": "56801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "9",
+          "lvar": "56901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "0",
+          "lvar": "57101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "DOT",
+          "lvar": "36301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "+/-",
+          "lvar": "57201 (>K:ROTOR_BRAKE)"
+        }
+      ],
+      "svg_image": "737.svg",
+      "output_vars": ["(L:switch_6042_73X, number) 0 >"]
+    },
+    {
+      "title": "B777",
+      "button_actions": [
+        {
+          "button": "LSK5",
+          "lvar": "33201  (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LSK6",
+          "lvar": "33301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LSK1",
+          "lvar": "32801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LSK2",
+          "lvar": "32901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LSK3",
+          "lvar": "33001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LSK4",
+          "lvar": "33101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK5",
+          "lvar": "33801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK6",
+          "lvar": "33901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK1",
+          "lvar": "33401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK2",
+          "lvar": "33501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK3",
+          "lvar": "33601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RSK4",
+          "lvar": "33701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "INIT_REF",
+          "lvar": "34001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "RTE",
+          "lvar": "34101  (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "DEP_ARR",
+          "lvar": "34201 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "ALTN",
+          "lvar": "34301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "VNAV",
+          "lvar": "34401  (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "FIX",
+          "lvar": "34501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "LEGS",
+          "lvar": "34601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "HOLD",
+          "lvar": "34701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "FMC_COMM",
+          "lvar": "347101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "PROG",
+          "lvar": "34801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "EXEC",
+          "lvar": "34901  (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "MENU",
+          "lvar": "35001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "NAV_RAD",
+          "lvar": "35101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "PREV_PAGE",
+          "lvar": "35201  (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "NEXT_PAGE",
+          "lvar": "35301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "A",
+          "lvar": "36601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "B",
+          "lvar": "36701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "C",
+          "lvar": "36801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "D",
+          "lvar": "36901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "E",
+          "lvar": "37001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "F",
+          "lvar": "37101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "G",
+          "lvar": "37201 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "H",
+          "lvar": "37301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "I",
+          "lvar": "37401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "J",
+          "lvar": "37501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "K",
+          "lvar": "37601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "L",
+          "lvar": "37701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "M",
+          "lvar": "37801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "N",
+          "lvar": "37901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "O",
+          "lvar": "38001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "P",
+          "lvar": "38101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "Q",
+          "lvar": "38201 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "R",
+          "lvar": "38301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "S",
+          "lvar": "38401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "T",
+          "lvar": "38501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "U",
+          "lvar": "38601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "V",
+          "lvar": "38701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "W",
+          "lvar": "38801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "X",
+          "lvar": "38901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "Y",
+          "lvar": "39001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "Z",
+          "lvar": "39101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "DEL",
+          "lvar": "39301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "SP",
+          "lvar": "39201 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "SLASH",
+          "lvar": "39401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "CLR",
+          "lvar": "39501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "1",
+          "lvar": "35401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "2",
+          "lvar": "35501 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "3",
+          "lvar": "35601 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "4",
+          "lvar": "35701 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "5",
+          "lvar": "35801 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "6",
+          "lvar": "35901 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "7",
+          "lvar": "36001 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "8",
+          "lvar": "36101 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "9",
+          "lvar": "36201 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "0",
+          "lvar": "36401 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "DOT",
+          "lvar": "36301 (>K:ROTOR_BRAKE)"
+        },
+        {
+          "button": "+/-",
+          "lvar": "36501 (>K:ROTOR_BRAKE)"
+        }
+      ],
+      "svg_image": "777.svg",
+      "output_vars": ["(L:switch_3491_a, number) 0 >"]
+    }
+  ],
+  "version": 2,
+  "app_version": 0,
+  "updated": "date"
+}

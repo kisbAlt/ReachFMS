@@ -40,25 +40,22 @@ impl ConfigHandler {
         };
 
         if !ConfigHandler::is_data_created() {
-            fs::create_dir("data").unwrap();
+            fs::create_dir(&get_file_in_exe_folder(vec!["data"])).unwrap();
 
-        }
-        if !std::path::Path::new("data/samples").exists() {
-            fs::create_dir("data/samples").unwrap();
         }
 
         if !ConfigHandler::is_config_created() {
-            File::create("data/config.json")
+            File::create(get_config_file())
                 .expect("Error encountered while creating file!");
             let json_string = serde_json::to_string(&default_config).unwrap();
-            fs::write("data/config.json", json_string).expect("Unable to write file");
+            fs::write(get_config_file(), json_string).expect("Unable to write file");
         }
-        qrcode_generator::to_png_to_file(host, QrCodeEcc::Low, 1024, "data/qr.png").unwrap();
+        qrcode_generator::to_png_to_file(host, QrCodeEcc::Low, 1024, get_qr_file()).unwrap();
         default_config
     }
 
     pub fn read_config(&mut self) {
-        let string_data = fs::read_to_string("data/config.json").expect("Unable to read file");
+        let string_data = fs::read_to_string(get_config_file()).expect("Unable to read file");
         let deserialized: ConfigHandler = serde_json::from_str(&string_data).unwrap();
         self.auto_hide = deserialized.auto_hide;
         self.refresh_rate = deserialized.refresh_rate;
@@ -81,11 +78,12 @@ impl ConfigHandler {
     }
 
     pub fn write_config(&self) {
-        if std::path::Path::new("data/config.json").exists() {
-            File::create("data/config.json")
+        let filename = get_config_file();
+        if std::path::Path::new(&filename).exists() {
+            File::create(&filename)
                 .expect("Error encountered while creating file!");
             let json_string = serde_json::to_string(self).unwrap();
-            fs::write("data/config.json", json_string).expect("Unable to write file");
+            fs::write(&filename, json_string).expect("Unable to write file");
         }
     }
 
@@ -98,10 +96,47 @@ impl ConfigHandler {
     }
 
     pub fn is_data_created() -> bool {
-        std::path::Path::new("data").exists()
+        std::path::Path::new(&get_file_in_exe_folder(vec!["data"])).exists()
     }
     pub fn is_config_created() -> bool {
-        std::path::Path::new("data/config.json").exists()
+        std::path::Path::new(&get_config_file()).exists()
     }
 
+}
+pub fn get_file_in_exe_folder(path_inside: Vec<&str>) -> String {
+    return match std::env::current_exe() {
+        Ok(mut res) => {
+            res.pop();
+
+            for item in path_inside {
+                res.push(item);
+            }
+
+            res.into_os_string().into_string().unwrap_or("".to_string())
+
+        }
+        Err(_) => {
+            "".to_string()
+        }
+    };
+}
+
+
+pub fn get_static_folder() -> String {
+    return get_file_in_exe_folder(vec!["static"])
+}
+
+pub fn get_addon_config() -> String {
+    return get_file_in_exe_folder(vec!["static", "addon_config.json"])
+}
+
+pub fn get_simconnector_exe() -> String {
+    return get_file_in_exe_folder(vec!["SimConnector.exe"])
+}
+
+pub fn get_config_file() -> String {
+    return get_file_in_exe_folder(vec!["data", "config.json"])
+}
+pub fn get_qr_file() -> String {
+    return get_file_in_exe_folder(vec!["data", "qr.png"])
 }

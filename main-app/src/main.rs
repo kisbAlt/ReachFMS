@@ -4,8 +4,8 @@ mod api_communicator;
 mod image_process;
 mod http_streamer;
 mod config_handler;
-mod SimConnectorBridge;
 mod comm_sender;
+mod addon_config;
 
 use std::{thread, time};
 use std::os::windows::process::CommandExt;
@@ -13,6 +13,7 @@ use std::process::{Command};
 use fltk::{enums::{Color, Font, FrameType, Cursor}, prelude::*, *};
 use fltk::app::{screen_size};
 use fltk::enums::{Event};
+use crate::addon_config::AddonConfig;
 use crate::config_handler::ConfigHandler;
 use crate::image_process::ImageProcess;
 
@@ -322,7 +323,6 @@ impl McduApp {
                 Err(..) => println!("error starting the server")
             };
         });
-
         while self.app.wait() {
             if let Some(msg) = self.receiver.recv() {
                 match msg {
@@ -367,7 +367,7 @@ impl McduApp {
                                         self.bridge_started = true;
                                         //self.hpack.show();
                                         self.qr_frame.show();
-                                        let mut qr_image = image::PngImage::load("data/qr.png").unwrap();
+                                        let mut qr_image = image::PngImage::load(config_handler::get_qr_file()).unwrap();
                                         qr_image.scale(200, 200, true, true);
                                         self.qr_frame.set_image(Some(qr_image));
                                         self.qr_frame.redraw();
@@ -423,7 +423,7 @@ fn main() {
     // let hostfxr = nethost::load_hostfxr().unwrap();
     // let context = hostfxr.initialize_for_dotnet_command_line(pdcstr!("Test.dll")).unwrap();
     // let result = context.run_app().value();
-    SimConnectorBridge::test();
+    let addon_config = AddonConfig::load();
     let a = McduApp::new();
     a.run();
 }
