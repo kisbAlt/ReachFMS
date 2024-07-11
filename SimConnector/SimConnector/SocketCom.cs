@@ -159,9 +159,14 @@ namespace SimConnector
             {
                 wasm.ButtonPressL(text.Split(":").ElementAt(1));
             }
+            else if (text.Contains("CUSTOM_WASM"))
+            {
+                Console.WriteLine($"Sending custom WASM: {text.Replace("CUSTOM_WASM:", "")}");
+                wasm.CustomWasm(text.Replace("CUSTOM_WASM:", ""));
+            }
             else if (text.Contains("GET_AIRCRAFT"))
             {
-                this.SendMessageAsync("AIRCRAFT:" + wasm.AircraftTitle.ToUpper());
+                this.SendMessageAsync("AIRCRAFT:" + wasm.AircraftFile.ToUpper());
             }
             Console.WriteLine($"GOT RESP:{text}");
         }

@@ -423,7 +423,7 @@ fn main() {
     // let hostfxr = nethost::load_hostfxr().unwrap();
     // let context = hostfxr.initialize_for_dotnet_command_line(pdcstr!("Test.dll")).unwrap();
     // let result = context.run_app().value();
-    let addon_config = AddonConfig::load();
+    
     let a = McduApp::new();
     a.run();
 }

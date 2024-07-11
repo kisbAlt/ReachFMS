@@ -1,7 +1,8 @@
 {
   "aircraft_addons": [
     {
-      "title": "a310",
+      "title": "MICROSOFT_A310",
+      "display": "iniBuilds A310",
       "button_actions": [
         {
           "button": "LSK5",
@@ -86,6 +87,10 @@
         {
           "button": "MENU",
           "lvar": "A310_MCDU1_MENU"
+        },
+        {
+          "button": "ENG_OUT",
+          "lvar": "INI_MCDU1_ENGOUT"
         },
         {
           "button": "PROG",
@@ -273,10 +278,14 @@
         }
       ],
       "svg_image": "a310.svg",
-      "output_vars": []
+      "output_vars": [],
+      "fms_aspect": 1.1145038168,
+      "display_width": 268,
+      "display_top": 11
     },
     {
-      "title": "A300",
+      "title": "INIBUILDS-AIRCRAFT-A30",
+      "display": "iniBuilds A300",
       "button_actions": [
         {
           "button": "LSK5",
@@ -361,6 +370,10 @@
         {
           "button": "MENU",
           "lvar": "INI_MCDU1_MENU"
+        },
+        {
+          "button": "ENG_OUT",
+          "lvar": "INI_MCDU1_ENGOUT"
         },
         {
           "button": "PROG",
@@ -548,10 +561,14 @@
         }
       ],
       "svg_image": "a310.svg",
-      "output_vars": []
+      "output_vars": [],
+      "fms_aspect": 1.1145038168,
+      "display_width": 268,
+      "display_top": 11
     },
     {
       "title": "B737",
+      "display": "PMDG 737-",
       "button_actions": [
         {
           "button": "LSK1",
@@ -843,10 +860,14 @@
         }
       ],
       "svg_image": "737.svg",
-      "output_vars": ["(L:switch_6042_73X, number) 0 >"]
+      "output_vars": ["(L:switch_6042_73X, number) 0 >"],
+      "fms_aspect": 1.113,
+      "display_width": 235,
+      "display_top": 25
     },
     {
-      "title": "B777",
+      "title": "PMDG 777-",
+      "display": "PMDG 777",
       "button_actions": [
         {
           "button": "LSK5",
@@ -874,27 +895,27 @@
         },
         {
           "button": "RSK5",
-          "lvar": "33801 (>K:ROTOR_BRAKE)"
+          "lvar": "33801  (>K:ROTOR_BRAKE)"
         },
         {
           "button": "RSK6",
-          "lvar": "33901 (>K:ROTOR_BRAKE)"
+          "lvar": "33901  (>K:ROTOR_BRAKE)"
         },
         {
           "button": "RSK1",
-          "lvar": "33401 (>K:ROTOR_BRAKE)"
+          "lvar": "33401  (>K:ROTOR_BRAKE)"
         },
         {
           "button": "RSK2",
-          "lvar": "33501 (>K:ROTOR_BRAKE)"
+          "lvar": "33501  (>K:ROTOR_BRAKE)"
         },
         {
           "button": "RSK3",
-          "lvar": "33601 (>K:ROTOR_BRAKE)"
+          "lvar": "33601  (>K:ROTOR_BRAKE)"
         },
         {
           "button": "RSK4",
-          "lvar": "33701 (>K:ROTOR_BRAKE)"
+          "lvar": "33701  (>K:ROTOR_BRAKE)"
         },
         {
           "button": "INIT_REF",
@@ -1126,10 +1147,13 @@
         }
       ],
       "svg_image": "777.svg",
-      "output_vars": ["(L:switch_3491_a, number) 0 >"]
+      "output_vars": ["(L:switch_3491_a, number) 0 >"],
+      "fms_aspect": 1.2602365787,
+      "display_width": 249,
+      "display_top": 50
     }
   ],
-  "version": 2,
+  "version": 4,
   "app_version": 0,
   "updated": "date"
 }

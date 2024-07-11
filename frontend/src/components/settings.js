@@ -9,6 +9,7 @@ import {
     sendSettings
 } from "../api_handler";
 import {Tick} from "./tick";
+import {getAircraftConfig} from "../config_handler";
 
 
 export  function _arrayBufferToBase64( buffer ) {
@@ -29,6 +30,7 @@ export function SettignsComponent(props) {
     const [multipleChecked, setMultipleChecked] = useState(true)
     const [bridgeConnected, setBridgeConnected] = useState(false)
     const [fenixSelected, setFenixSelected] = useState(false)
+    const [loadedAircraft, setLoadedAircraft] = useState("")
     const [instrumentSettings, setInstrumentSettings] = useState([])
     const [autoStartServer, setAutoStartServer] = useState(false)
 
@@ -107,11 +109,6 @@ export function SettignsComponent(props) {
         var status = await getStatus();
         var settings = status.settings;
         var refresh_setting = "normal"
-        if(!settings.calibrated){
-            if(new URLSearchParams(window.location.search).get('skip_calibration') == null){
-                window.location = "?calibration=true"
-            }
-        }
 
         props.setRefresh(settings.refresh_rate)
         switch (settings.refresh_rate) {
@@ -139,14 +136,13 @@ export function SettignsComponent(props) {
         props.setTiff(!settings.max_fps)
         document.getElementById("refresh").value = refresh_setting;
 
-        if (status.bridge_status !== "false") {
-            if (status.bridge_status.includes("connected=true")) {
-                setBridgeConnected(true);
-            }
-            if (status.bridge_status.includes("Fenix")) {
-                setFenixSelected(true)
-            }
+        setBridgeConnected(status.bridge_status.connected)
+
+        let aircraft_config = await getAircraftConfig();
+        if(aircraft_config != null) {
+            setLoadedAircraft(aircraft_config.display)
         }
+
     }
 
     function getBaseImageString(buffer) {
@@ -223,9 +219,9 @@ export function SettignsComponent(props) {
                 {bridgeConnected ? ("Connected") : ("Disconnected")}</span>
                 {bridgeConnected && (<Tick color={"green"}/>)}</h2>
             {bridgeConnected && (
-                <h2><span style={{color: `${fenixSelected ? ("greenyellow") : ("red")}`}}>
-                {fenixSelected ? ("Fenix A320 selected") : ("Please load Fenix A320")}</span>
-                    {fenixSelected && (<Tick color={"green"}/>)}</h2>
+                <h2><span style={{color: `${loadedAircraft != "" ? ("greenyellow") : ("red")}`}}>
+                {loadedAircraft != "" ? (loadedAircraft) : ("Please load a supported aircraft!")}</span>
+                    {loadedAircraft != "" && (<Tick color={"green"}/>)}</h2>
             )}
             <div style={{
                 width: "1300px",
@@ -233,7 +229,7 @@ export function SettignsComponent(props) {
                 marginLeft: "auto",
                 marginRight: "auto"
             }}>
-                {fenixSelected ?
+                {loadedAircraft != "" ?
                     (
                         <div>
 

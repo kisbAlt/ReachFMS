@@ -11,8 +11,8 @@ use windows::{
 #[derive(Serialize, Deserialize, Clone)]
 pub struct InstrumentRgb {
     pub hwnd: isize,
-    height: u16,
-    width: u16,
+    pub height: u16,
+    pub width: u16,
     pub instrument: String,
     pub jpeg_bytes: Vec<u8>,
     //[[crop_x,cropy_y],[crop_w, crop_h]]
@@ -49,64 +49,28 @@ impl ImageProcess {
     // pub fn init() -> Self {
     //     Self {}
     // }
-    pub fn start(previous_state: Option<Vec<InstrumentRgb>>, autohide: bool, force_refresh: bool) -> Vec<InstrumentRgb> {
+    pub fn start() -> Vec<InstrumentRgb> {
         let av_hw = ImageProcess::find_popup_windows();
         let mut rgb_list: Vec<InstrumentRgb> = Vec::new();
         if av_hw.len() == 0 { return rgb_list; }
 
-        // let mut local_prev_state: Vec<InstrumentRgb> = Vec::new();
-        // if previous_state.is_some() && !force_refresh {
-        //     local_prev_state = previous_state.unwrap();
-        // }
-
-        let mut needs_update: Vec<InstrumentPosition> = Vec::new();
         for hw in av_hw.iter() {
-            unsafe {
-                let win_pos = ImageProcess::get_window_pos(hw.clone());
-                needs_update.push(InstrumentPosition {
-                    top: win_pos.top,
-                    left: win_pos.left,
-                    width: win_pos.right - win_pos.left,
-                    height: win_pos.bottom - win_pos.top,
-                    hwnd: *hw,
-                });
-                ImageProcess::hide_window(hw.clone());
-            }
-        }
-        // if needs_update.len() > 0 {
-        //     std::thread::spawn(move || {
-        //         api_communicator::brightness_full();
-        //     }).join().unwrap();
-        // }
-        //thread::sleep(std::time::Duration::from_millis(500));
-        for current_instr in needs_update {
-            let buf = capture_window_ex(current_instr.hwnd.clone(), Using::PrintWindow,
+            let buf2 = ImageProcess::capture_instrument(
+                hw.clone(), [[0, 0], [0, 0]]);
+
+
+            let buf = capture_window_ex(hw.clone(), Using::PrintWindow,
                                         Area::ClientOnly, None, None).unwrap();
             let img = RgbaImage::from_raw(buf.width, buf.height, buf.pixels).unwrap();
 
-            let resized = image::imageops::resize(&img, 120,
-                                                  120, image::imageops::FilterType::Nearest);
-            
-            let mut buffer = BufWriter::new(Cursor::new(Vec::new()));
-            resized.write_to(&mut buffer, ImageFormat::Jpeg).unwrap();
-            let bytes: Vec<u8> = buffer.into_inner().unwrap().into_inner();
-
-
-            if !autohide {
-                unsafe {
-                    ImageProcess::move_window(current_instr.hwnd.clone(), current_instr.top,
-                                              current_instr.left, current_instr.width, current_instr.height);
-                }
-            }
-            let instr: String = "PFD".to_string();
+            let instr: String = "MCDU".to_string();
             let current = InstrumentRgb {
-                hwnd: current_instr.hwnd,
+                hwnd: *hw,
                 height: img.height() as u16,
                 width: img.width() as u16,
-                crop: ImageProcess::find_crop_for_instruments(
-                    instr.clone(), img.width(), img.height()),
+                crop: ImageProcess::find_crop_for_instruments(img.width(), img.height()),
                 instrument: instr,
-                jpeg_bytes: bytes,
+                jpeg_bytes: buf2.unwrap(),
                 auto_hide: true,
                 excluded: false,
             };
@@ -114,73 +78,34 @@ impl ImageProcess {
         }
         rgb_list
     }
-    // fn get_system(pxels: Pixels<Rgba<u8>>, sure: bool) -> String {
-    //     return if sure {
-    //         for p in pxels {
-    //             let rgba: [u8; 4] = p.0;
-    //             let [r, g, b, _a] = rgba;
-    //             let clr: [u8; 3] = [r, g, b];
-    //             if clr == [111, 50, 0] || clr == [110, 51, 0] {
-    //                 return "PFD".to_string();
-    //             } else if clr == [70, 60, 35] || clr == [70, 61, 36] || clr == [71, 60, 35] {
-    //                 return "SIS".to_string();
-    //             } else if clr == [172, 201, 253] {
-    //                 return "L_ECAM".to_string();
-    //             } else if clr == [246, 222, 179] || clr == [246, 222, 179] || clr == [245, 223, 180] {
-    //                 return "SEGMENTS".to_string();
-    //             }
-    //         }
-    //         "".to_string()
-    //     } else {
-    //         let mut has_nd_yellow = false;
-    //         // let mut num_of_white_row: u8 = 0;
-    //         // let mut max_white = 0;
-    //         for p in pxels {
-    //             let rgba: [u8; 4] = p.0;
-    //             let [r, g, b, _a] = rgba;
-    //             let clr: [u8; 3] = [r, g, b];
-    //             if clr == [227, 18, 0] || clr == [81, 104, 127] || clr == [228, 18, 0]
-    //                 || clr == [82, 102, 126] || clr == [82, 103, 126] || clr == [79, 100, 122] {
-    //                 return "U_ECAM".to_string();
-    //             } else if clr == [255, 255, 0] {
-    //                 has_nd_yellow = true;
-    //             }
-    //         }
-    //         if has_nd_yellow { return "ND".to_string(); }
-    //
-    //         "MCDU".to_string()
-    //     };
-    // }
 
-    fn find_crop_for_instruments(instrument: String, width: u32, height: u32) -> [[i32; 2]; 2] {
+    fn find_crop_for_instruments(width: u32, height: u32) -> [[i32; 2]; 2] {
         let crop: [[i32; 2]; 2] = [[0, 0], [width as i32, height as i32]];
-        if instrument == "".to_string() { return crop; }
+        
 
-        if instrument == "U_ECAM".to_string() || instrument == "L_ECAM".to_string()
-            || instrument == "ND".to_string() || instrument == "PFD".to_string()
-            || instrument == "SEGMENTS".to_string() || instrument == "SIS".to_string() {
-            return if width == height {
-                crop
-            } else if width > height {
-                let crop_pixels = width - height;
-                [[(crop_pixels / 2) as i32, 0], [height as i32, height as i32]]
-            } else {
-                let crop_pixels = height - width;
-                [[0, (crop_pixels / 2) as i32], [width as i32, width as i32]]
-            };
-        } else if instrument == "MCDU".to_string() {
-            // } else if (img_height / img_width) > 1.3 {
-            let mcdu_ratio: f32 = 0.866;
-            if width as f32 * mcdu_ratio < height as f32 {
-                let correct_height = width as f32 * mcdu_ratio;
-                let gap = height as f32 - correct_height;
-                return [[0, (gap / 2.0) as i32], [width as i32, correct_height as i32]];
-            } else if height as f32 / mcdu_ratio < width as f32 {
-                let correct_width = height as f32 / mcdu_ratio;
-                let gap = width as f32 - correct_width;
-                return [[(gap / 2.0) as i32, 0], [correct_width as i32, height as i32]];
-            }
-        }
+        return if width == height {
+            crop
+        } else if width > height {
+            let crop_pixels = width - height;
+            [[(crop_pixels / 2) as i32, 0], [height as i32, height as i32]]
+        } else {
+            let crop_pixels = height - width;
+            [[0, (crop_pixels / 2) as i32], [width as i32, width as i32]]
+        };
+
+        // else if instrument == "MCDU".to_string() {
+        //     // } else if (img_height / img_width) > 1.3 {
+        //     let mcdu_ratio: f32 = 0.866;
+        //     if width as f32 * mcdu_ratio < height as f32 {
+        //         let correct_height = width as f32 * mcdu_ratio;
+        //         let gap = height as f32 - correct_height;
+        //         return [[0, (gap / 2.0) as i32], [width as i32, correct_height as i32]];
+        //     } else if height as f32 / mcdu_ratio < width as f32 {
+        //         let correct_width = height as f32 / mcdu_ratio;
+        //         let gap = width as f32 - correct_width;
+        //         return [[(gap / 2.0) as i32, 0], [correct_width as i32, height as i32]];
+        //     }
+        // }
 
         crop
     }
@@ -273,6 +198,7 @@ impl ImageProcess {
             _ => { Option::from(crop[1]) }
         };
 
+
         let buf = match capture_window_ex(hw_id, USING, AREA,
                                           cropxy, cropwh) {
             Ok(tempbuf) => tempbuf,
@@ -315,5 +241,12 @@ impl ImageProcess {
 
         std::fs::write(format!("data/samples/template_{}.png", instrument), buf).unwrap();
         "ok"
+    }
+    
+    pub fn restore_all() {
+        let poputs = ImageProcess::find_popup_windows();
+        for popout in poputs {
+            unsafe { ImageProcess::move_window(popout, 0, 0, 700, 700) }
+        }
     }
 }

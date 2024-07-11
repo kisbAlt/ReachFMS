@@ -22,7 +22,6 @@ function App() {
     const [notifMessage, setNotifMessage] = useState("");
     const [selectedHwnd, setSelectedHwnd] = useState(0);
     const [calibrated, setCalibrated] = useState(true)
-    const [fps, setFps] = useState(0);
     const [fpsStart, setFpsStart] = useState(new Date());
     const [showFps, setShowFps] = useState(false);
     const showFps_ref = useRef();
@@ -69,61 +68,6 @@ function App() {
         setSelectedRefreshRateMs(rate)
     }
 
-    async function imageUpdater() {
-        await sleep(refresh_ref.current)
-        var img = document.getElementById("streamImage")
-        if (img !== null && instr_ref.current !== "Settings" && !document.hidden && hwnd_ref.current !== 0) {
-            if (showFps_ref.current) {
-                let frm = frameNum_ref.current
-                setFps(frm / ((new Date() - fpsStart) / 1000))
-                setFrameNum(frm + 1)
-            }
-            if (tiff_ref.current) {
-                var xhr = new XMLHttpRequest();
-                xhr.responseType = 'arraybuffer';
-                xhr.open('GET', process.env.REACT_APP_LOCALHOST_PREFIX + `/get_image?hwnd=${hwnd_ref.current}&rand=` + Math.random());
-                xhr.onload = function (e) {
-                    //eslint-disable-next-line
-                    var tiff = new Tiff({buffer: xhr.response, TOTAL_MEMORY: 314572800});
-                    // var width = tiff.width();
-                    // var height = tiff.height();
-                    var canvas = tiff.toCanvas();
-                    //img.innerHTML = "";
-                    while (img.firstChild) {
-                        img.removeChild(img.lastChild);
-                    }
-                    if (canvas) {
-                        if (instr_ref.current === "MCDU" || instr_ref.current === "L_ECAM") {
-                            canvas.setAttribute('style', 'width:' + (img.style.width) +
-                                '; height: auto');
-                        } else {
-                            canvas.setAttribute('style',
-                                window.screen.height > window.screen.width ? (`width: ${img.offsetWidth}px; height: auto`)
-                                    : (`height: ${img.offsetHeight - 50}px;width: auto;`));
-                        }
-                        img.append(canvas)
-                        tiff.close();
-                    }
-                    imageUpdater()
-                };
-                xhr.send();
-
-            } else {
-                img.onload = () => {
-                    imageUpdater()
-                }
-                img.onerror = imageUpdater;
-                img.src = process.env.REACT_APP_LOCALHOST_PREFIX + `/get_image?hwnd=${hwnd_ref.current}&rand=` + Math.random();
-            }
-
-        } else {
-            imageUpdater();
-        }
-
-        // setInterval(function () {
-        // }, refresh_ref);
-    }
-
     async function refreshInstruments(force = false) {
         setShowLoading(true)
         var resp;
@@ -141,8 +85,10 @@ function App() {
         if (local_list.filter(x => x === "MCDU").length > 1) {
             let message = "It seems like the display detection is not working correctly. " +
                 "Make sure that alternate renderer option below is enabled if you using it in the fenix app."
-            if (local_list.filter(x => x === "MCDU").length === 2) {message+="Ignore this message if you are using both MCDU"}
-            showNotification(message,true, 10)
+            if (local_list.filter(x => x === "MCDU").length === 2) {
+                message += "Ignore this message if you are using both MCDU"
+            }
+            showNotification(message, true, 10)
         }
         setShowLoading(false)
         return resp
@@ -166,7 +112,7 @@ function App() {
                 var settings = res.settings;
                 changeRefreshRate(settings.refresh_rate)
                 setTiffUsage(!settings.max_fps)
-                setCalibrated(settings.calibrated)
+                setCalibrated(true)
                 let fnd = await refreshInstruments()
                 for (let i = 0; i < fnd.length; i++) {
                     if (fnd[i].instrument === dispParam) {
@@ -176,17 +122,16 @@ function App() {
             });
         }
 
-        const script = document.createElement("script");
-        script.src = process.env.REACT_APP_LOCALHOST_PREFIX + "/tiff.min.js";
-        script.async = true;
-        document.body.appendChild(script);
-        imageUpdater();
+        // const script = document.createElement("script");
+        // //script.src = process.env.REACT_APP_LOCALHOST_PREFIX + "/tiff.min.js";
+        // script.async = true;
+        // document.body.appendChild(script);
         refreshInstruments()
 
         // eslint-disable-next-line
     }, []);
 
-    if (new URLSearchParams(window.location.search).get('display_only') == null && new URLSearchParams(window.location.search).get('calibration') == null) {
+    if (new URLSearchParams(window.location.search).get('display_only') == null) {
         return (
 
             <div style={{
@@ -315,36 +260,25 @@ function App() {
                 <div style={{overflow: "hidden", height: "100%", width: "100%"}}>
                     {
                         {
-                            'Settings': "",
-                            'MCDU': (<McduComponent fullScreenMode={fullScreenMode} useTif={useTiff}/>),
+                            'Settings': (
+                                //<McduComponent fullScreenMode={fullScreenMode} useTif={useTiff}/>
+                                <SettignsComponent setCalibratedFalse={() => {
+                                    setCalibrated(false)
+                                }}
+                                                   instrumentObjects={foundInstrumentObjects}
+                                                   showNotification={showNotification} setTiff={setTiffUsage}
+                                                   setRefresh={changeRefreshRate} setInstrument={instrumentMenuSelectHandler}
+                                                   refreshFunction={() => {
+                                                       refreshInstruments(true)
+                                                   }}/>
+                            ),
+                            'PFD': (<McduComponent fullScreenMode={fullScreenMode} useTif={useTiff}/>),
                             'L_ECAM': (<LoverEcam fullScreenMode={fullScreenMode} useTif={useTiff}/>),
                         }[selectedInstrument] ?? (
-                            useTiff ? (<div style={{
-                                    maxWidth: "100vw", maxHeight: fullScreenMode ? ("100vh") : ("80vh"), marginLeft: "auto",
-                                    marginRight: "auto", height: '100%', width: "100%"
-                                }}
-                                            id={"streamImage"}
-                                            alt={"streamImage"}/>)
-                                : (<img
-                                    style={{
-                                        maxWidth: "100vw", maxHeight: fullScreenMode ? ("100vh") : ("80vh"),
-                                        height: "auto"
-                                    }}
-                                    id={"streamImage"}
-                                    src={process.env.REACT_APP_LOCALHOST_PREFIX + "/get_image?hwnd=592236&rand="}
-                                    alt={"streamImage"}/>)
+                            <McduComponent fullScreenMode={fullScreenMode} useTif={useTiff}/>
 
                         )
                     }
-                    {selectedInstrument === "Settings" && (
-                        <SettignsComponent setCalibratedFalse={() => {setCalibrated(false)}}
-                                            instrumentObjects={foundInstrumentObjects}
-                                           showNotification={showNotification} setTiff={setTiffUsage}
-                                           setRefresh={changeRefreshRate} setInstrument={instrumentMenuSelectHandler}
-                                           refreshFunction={() => {
-                                               refreshInstruments(true)
-                                           }}/>
-                    )}
 
                 </div>
                 {!fullScreenMode && (<svg width="152.6" onClick={() => {
@@ -419,9 +353,7 @@ function App() {
             </div>
         );
 
-    }else if(new URLSearchParams(window.location.search).get('calibration') != null){
-        return <CalibrationComponent/>
-    }else {
+    } else {
         return (
             useTiff ? (<div style={{
                     maxWidth: "100vw", maxHeight: fullScreenMode ? ("100vh") : ("80vh"), marginLeft: "auto",

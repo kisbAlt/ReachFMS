@@ -1,45 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+<head>
+    <meta charset="utf-8"/>
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="theme-color" content="#000000"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta
-      name="description"
-      content="Web site created using create-react-app"
+            name="description"
+            content="Web site created using create-react-app"
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png"/>
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json"/>
     <title>Fenix remote MCDU</title>
-  </head>
-  <body style="background-color: black; overflow: hidden">
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+</head>
+<body style="background-color: black; overflow: hidden">
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div id="root"></div>
 
-  </body>
+</body>
 <script>
-  function buttonPressed() {
-    window.onclick = e => {
-      if (e.target.getAttribute('ascii')) {
-        //console.log(e.target.getAttribute('ascii'))
-        //fetch("http://localhost:5273" +"/mcdu_btn_press?btn="+e.target.getAttribute('ascii'))
-        var call_url;
-        if(document.getElementById("foTogBtn")){
-          call_url = "/mcdu_btn_press?btn="+e.target.getAttribute('ascii')+`&usefo=${document.getElementById("foTogBtn").checked}`
-        }else{
-          call_url = "/mcdu_btn_press?btn="+e.target.getAttribute('ascii')
+    function buttonPressed() {
+        window.onclick = e => {
+            var call_url = "http://localhost:5273";
+            //var call_url = "";
+            let allowed = ["rect", "text", "g", "tspan", "path"]
+            let parent = document.getElementById(e.target.id);
+            console.log(e.target.tagName);
+            if (e.target.getAttribute('ascii')) {
+                //console.log(e.target.getAttribute('ascii'))
+                //fetch("http://localhost:5273" +"/mcdu_btn_press?btn="+e.target.getAttribute('ascii'))
+                if (document.getElementById("foTogBtn")) {
+                    call_url += "/mcdu_btn_press?btn=" + e.target.getAttribute('ascii') + `&usefo=${document.getElementById("foTogBtn").checked}`
+                } else {
+                    call_url += "/mcdu_btn_press?btn=" + e.target.getAttribute('ascii')
 
-        }
+                }
+                if (document.getElementById("foTogBtn") !== null) {
+                    localStorage.setItem("usefo", document.getElementById("foTogBtn").checked)
+                }
+
+            } else if (allowed.includes(e.target.tagName)) {
+                while (parent.getAttribute("inkscape:label") == null ||
+                !parent.getAttribute("inkscape:label").includes("BTN:")) {
+                    parent = parent.parentElement;
+                }
+                let btn = parent.getAttribute("inkscape:label");
+                call_url += "/mcdu_btn_press?btn=" + btn
+                console.log("BTN:", btn)
+            }
         fetch(call_url)
-        if(document.getElementById("foTogBtn") !== null){
-          localStorage.setItem("usefo", document.getElementById("foTogBtn").checked)
         }
-
-      }
     }
-  }
 </script>
 </html>

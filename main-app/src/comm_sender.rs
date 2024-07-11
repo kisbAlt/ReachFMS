@@ -5,7 +5,7 @@ use crate::http_streamer::BridgeStatus;
 pub fn get_aircraft(command_sender: &crossbeam_channel::Sender<String>,
                     comm_receiver: &crossbeam_channel::Receiver<String>) -> String {
     let timeout = std::time::Duration::from_millis(100);
-    command_sender.send("BridgeStatus".to_string()).expect("Can't send.");
+    command_sender.send("GetAircraft".to_string()).expect("Can't send.");
     let mut aircraft: String = "".to_string();
     let started: Instant = Instant::now();
     let mut got_info = false;

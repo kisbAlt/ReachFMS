@@ -70,3 +70,13 @@ export async function sendCalibration(calibstr) {
     return (await fetch(process.env.REACT_APP_LOCALHOST_PREFIX +
         `/calibrate_displays?calibratestr=${calibstr}`)).text()
 }
+
+export async function getAddonConfig() {
+    return (await fetch(process.env.REACT_APP_LOCALHOST_PREFIX +
+        `/static/addon_config.json`)).json()
+}
+
+export async function getAircraftFile() {
+    return (await fetch(process.env.REACT_APP_LOCALHOST_PREFIX +
+        `/get_aircraft`)).text()
+}

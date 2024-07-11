@@ -6,3 +6,8 @@
 /SimConnector/SimConnector/bin
 /SimConnector/SimConnector/obj
 /main-app/target
+/frontend/.idea
+/frontend/node_modules
+/main-app/.fleet
+/frontend/yarn.lock
+/frontend/yarn.lock

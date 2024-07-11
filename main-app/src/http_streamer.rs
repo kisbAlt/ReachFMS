@@ -1,19 +1,21 @@
 use std::{fs, thread};
 use std::fs::File;
 use std::process::Child;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use actix_cors::Cors;
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder, HttpRequest, Error};
 use actix_web_actors::ws;
-use actix::{Actor, AsyncContext, Handler, Message, StreamHandler};
+use actix::{Actor, Addr, AsyncContext, Handler, Message, StreamHandler};
 use win_screenshot::prelude::*;
 use crate::{api_communicator, comm_sender, ImageProcess};
 use image::{RgbaImage};
 use image;
 use qstring::QString;
 use std::time::{Instant};
+use actix::dev::SendError;
 use actix_files::Files;
 use crossbeam_channel::{bounded, select, after};
+use fltk::image::Image;
 use crate::config_handler::{ConfigHandler, DebugSave, get_static_folder};
 use crate::image_process::InstrumentRgb;
 use serde::{Deserialize, Serialize};
@@ -21,7 +23,7 @@ use crate::addon_config::AddonConfig;
 
 #[derive(Serialize, Deserialize)]
 struct StatusResponse {
-    bridge_status: String,
+    bridge_status: BridgeStatus,
     settings: ConfigHandler,
 }
 #[derive(Serialize, Deserialize)]
@@ -30,6 +32,14 @@ pub struct BridgeStatus {
     pub started: bool,
     pub connected: bool,
     pub comm: bool,
+}
+
+
+pub struct ImageSubscriptionStatus {
+    pub thread_started: Arc<Mutex<bool>>,
+    pub selected_hwnd: Arc<Mutex<isize>>,
+    pub img_sub_list: Arc<Mutex<Vec<Addr<MyWs>>>>,
+    pub display_crop: Arc<Mutex<[[i32; 2]; 2]>>,
 }
 
 
@@ -43,14 +53,17 @@ struct AppState {
     icon_png: &'static [u8],
     instrument_list: Mutex<Vec<InstrumentRgb>>,
     list_of_allowed_hwnd: Mutex<Vec<isize>>,
-    config: Mutex<ConfigHandler>,
+    config: Arc<Mutex<ConfigHandler>>,
     child_process: Mutex<Option<Child>>,
-    selected_hwnd: Mutex<isize>,
+    //selected_hwnd: Mutex<isize>,
     command_sender: crossbeam_channel::Sender<String>,
     command_receiver: crossbeam_channel::Receiver<String>,
     comm_sender: crossbeam_channel::Sender<String>,
     comm_receiver: crossbeam_channel::Receiver<String>,
     bridge_status: Mutex<BridgeStatus>,
+    img_sub_status: ImageSubscriptionStatus,
+    current_aircraft: Mutex<String>,
+    addon_config: AddonConfig,
 }
 
 
@@ -147,7 +160,7 @@ async fn stop_server(data: web::Data<AppState>) -> impl Responder {
     let mut brid_status = data.bridge_status.lock().unwrap().clone();
     brid_status.started = false;
     drop(brid_status);
-    
+
     HttpResponse::Ok().body("stopped")
 }
 
@@ -266,15 +279,15 @@ async fn save_debug(data: web::Data<AppState>) -> impl Responder {
     let file = File::create("debug.tar").unwrap();
     let mut a = tar::Builder::new(file);
 
-    
+
     let mut brid_status = data.bridge_status.lock().unwrap().clone();
     comm_sender::get_status(&mut brid_status, data.command_sender.clone(), data.comm_receiver.clone());
     let temp_status: String = serde_json::to_string(&brid_status).unwrap_or("".to_string());
     drop(brid_status);
-    
-    
+
+
     let conf = data.config.lock().unwrap();
-    let temp_instr = ImageProcess::start(None, false, false);
+    let temp_instr = ImageProcess::start();
 
     let debug: DebugSave = DebugSave {
         instrument_list: ImageProcess::window_to_string(&temp_instr),
@@ -319,15 +332,15 @@ async fn save_debug(data: web::Data<AppState>) -> impl Responder {
 async fn status(data: web::Data<AppState>) -> impl Responder {
     let mut brid_status = data.bridge_status.lock().unwrap().clone();
     comm_sender::get_status(&mut brid_status, data.command_sender.clone(), data.comm_receiver.clone());
-    let resp: String = serde_json::to_string(&brid_status).unwrap_or("".to_string());
-    drop(brid_status);
+
+
     let sting = data.config.lock().unwrap();
     let resp: StatusResponse = StatusResponse {
         settings: sting.clone(),
-        bridge_status: resp,
+        bridge_status: brid_status.clone(),
     };
     drop(sting);
-
+    drop(brid_status);
 
     HttpResponse::Ok().body(serde_json::to_string(&resp).unwrap())
 }
@@ -338,20 +351,25 @@ async fn mcdu_btn(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
     let query_str = req.query_string();
     let qs = QString::from(query_str);
     let btn_id = qs.clone().get("btn").unwrap_or("").to_string();
+    let aircraft = data.current_aircraft.lock().unwrap().clone();
 
+    if aircraft.is_empty() {}
 
-    data.command_sender.send(format!("SM_SEND:CMD_BTN:{}", btn_id)).expect("ERROR SENDING MESSAGE");
+    let lvar = data.addon_config.get_var(btn_id.replace("BTN:", ""), aircraft);
+
+    if lvar.contains("K:") {
+        data.command_sender.send(format!("SM_SEND:CUSTOM_WASM:{}", lvar)).expect("ERROR SENDING MESSAGE");
+    } else {
+        data.command_sender.send(format!("SM_SEND:CMD_BTN:{}", lvar)).expect("ERROR SENDING MESSAGE");
+    }
+
 
     HttpResponse::Ok().body("ok")
 }
 
 #[get("/restore_windows")]
-async fn restore_windows(data: web::Data<AppState>) -> HttpResponse {
-    let hw_list = data.list_of_allowed_hwnd.lock().unwrap();
-    let list_clone = hw_list.clone();
-    for wn in list_clone {
-        unsafe { ImageProcess::move_window(wn, 0, 0, 700, 700) }
-    }
+async fn restore_windows() -> HttpResponse {
+    ImageProcess::restore_all();
 
     HttpResponse::Ok().body("ok")
 }
@@ -374,8 +392,33 @@ async fn get_windows(data: web::Data<AppState>) -> HttpResponse {
     let mut hw_list = data.list_of_allowed_hwnd.lock().unwrap();
     let conf = data.config.lock().unwrap();
 
-    let wndows = ImageProcess::start(
-        Option::from(state_instruments.clone()), conf.auto_hide, false);
+    let wndows = ImageProcess::start();
+
+    if wndows.len() > 0 {
+        let selected_hwnd = wndows[0].hwnd;
+        let mut sub_hwnd = data.img_sub_status.selected_hwnd.lock().unwrap();
+        *sub_hwnd = selected_hwnd;
+        drop(sub_hwnd);
+
+        let aircraft: String = comm_sender::get_aircraft(&data.command_sender, &data.comm_receiver);
+        let mut saved = data.current_aircraft.lock().unwrap();
+        *saved = aircraft.clone();
+        drop(saved);
+
+        unsafe {
+            
+            if conf.auto_hide {
+                ImageProcess::hide_window(selected_hwnd)
+            }else {
+                let wsize = ImageProcess::get_window_pos(selected_hwnd);
+                ImageProcess::move_window(selected_hwnd, wsize.top, wsize.left, 700, 700);
+            }
+        };
+        let find_crop = data.addon_config.calculate_crop(aircraft,
+                                                         700, 700);
+        let mut crop = data.img_sub_status.display_crop.lock().unwrap();
+        *crop = find_crop;
+    }
 
     let mut local_hwnd_list: Vec<isize> = Vec::new();
     for i in &wndows {
@@ -387,13 +430,15 @@ async fn get_windows(data: web::Data<AppState>) -> HttpResponse {
     *state_instruments = wndows;
     drop(state_instruments);
 
+
     HttpResponse::Ok().body(resp)
 }
 
 #[get("/get_aircraft")]
 async fn get_aircraft(data: web::Data<AppState>) -> HttpResponse {
     let aircraft: String = comm_sender::get_aircraft(&data.command_sender, &data.comm_receiver);
-    
+    let mut saved = data.current_aircraft.lock().unwrap();
+    *saved = aircraft.clone();
     return HttpResponse::Ok().body(aircraft);
 }
 
@@ -403,8 +448,7 @@ async fn force_rescan(data: web::Data<AppState>) -> HttpResponse {
     let mut hw_list = data.list_of_allowed_hwnd.lock().unwrap();
     let conf = data.config.lock().unwrap();
 
-    let wndows = ImageProcess::start(
-        Option::from(state_instruments.clone()), conf.auto_hide, true);
+    let wndows = ImageProcess::start();
 
     let mut local_hwnd_list: Vec<isize> = Vec::new();
     for i in &wndows {
@@ -450,20 +494,20 @@ async fn image_state(data: web::Data<AppState>) -> HttpResponse {
 
 #[get("/set_hwnd")]
 async fn set_hwnd(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
-    let mut hwnd = data.selected_hwnd.lock().unwrap();
-    let query_str = req.query_string(); // "name=ferret"
-    let qs = QString::from(query_str);
-    let hw_id = qs.get("hwnd").unwrap().parse::<u32>().unwrap_or(0) as isize;
-
-    let allowed_hwnd = data.list_of_allowed_hwnd.lock().unwrap();
-    if !allowed_hwnd.contains(&hw_id) {
-        return HttpResponse::Ok()
-            .body("Not allowed");
-    }
-    drop(allowed_hwnd);
-
-    *hwnd = hw_id;
-    drop(hwnd);
+    // let mut hwnd = data.selected_hwnd.lock().unwrap();
+    // let query_str = req.query_string(); // "name=ferret"
+    // let qs = QString::from(query_str);
+    // let hw_id = qs.get("hwnd").unwrap().parse::<u32>().unwrap_or(0) as isize;
+    //
+    // let allowed_hwnd = data.list_of_allowed_hwnd.lock().unwrap();
+    // if !allowed_hwnd.contains(&hw_id) {
+    //     return HttpResponse::Ok()
+    //         .body("Not allowed");
+    // }
+    // drop(allowed_hwnd);
+    //
+    // *hwnd = hw_id;
+    // drop(hwnd);
     HttpResponse::Ok()
         .body("ok")
 }
@@ -567,6 +611,11 @@ async fn test_ws(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
 struct MyWs {
     pub command_receiver: crossbeam_channel::Receiver<String>,
     pub comm_sender: crossbeam_channel::Sender<String>,
+    pub img_subscribers: Arc<Mutex<Vec<Addr<MyWs>>>>,
+    pub sub_started: Arc<Mutex<bool>>,
+    pub sub_hwnd: Arc<Mutex<isize>>,
+    pub img_crop: Arc<Mutex<[[i32; 2]; 2]>>,
+    pub config: Arc<Mutex<ConfigHandler>>,
 }
 
 impl Actor for MyWs {
@@ -580,21 +629,30 @@ impl Handler<StringConnectMessage> for MyWs {
     type Result = ();
 
     fn handle(&mut self, msg: StringConnectMessage, ctx: &mut Self::Context) {
-        // Send the string message to the WebSocket client
-        println!("sending StringConnectMessage: {}", msg.0);
         ctx.text(msg.0);
+    }
+}
+
+
+// Define a custom message type for sending binary data
+#[derive(Message)]
+#[rtype(result = "()")]
+struct BinaryMessage(Vec<u8>);
+
+impl Handler<BinaryMessage> for MyWs {
+    type Result = ();
+
+    fn handle(&mut self, msg: BinaryMessage, ctx: &mut Self::Context) {
+        ctx.binary(msg.0);
     }
 }
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
-        println!("msg");
         match msg {
             Ok(ws::Message::Ping(msg)) => ctx.pong(&msg),
             Ok(ws::Message::Text(text)) => {
-                println!("ws message: {}", text);
-
-                if (text == "ConnectWSClient") {
+                if text == "ConnectWSClient" {
                     let rx = self.command_receiver.clone();
                     let sn = self.comm_sender.clone();
                     let addr = ctx.address().clone();
@@ -613,23 +671,84 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
                             if (value == "BridgeStatus") {
                                 println!("Getting status...");
                                 addr.do_send(StringConnectMessage("STATUS".to_string()));
-                            } else if (value.contains("SM_SEND:")) {
+                            } else if value == "GetAircraft" {
+                                addr.do_send(StringConnectMessage("GET_AIRCRAFT".to_string()));
+                            } else if value.contains("SM_SEND:") {
                                 //let cmnd: &str = value.split(":").collect::<Vec<&str>>()[1];
+                                println!("SM: {}", value.replace("SM_SEND:", ""));
                                 addr.do_send(StringConnectMessage(value.replace("SM_SEND:", "")))
                             }
-
-                            println!("Got channel val: {value}");
                         }
                     });
                     ctx.text("CONNECTED");
-                } else if (text.contains("STATUS:")) {
-                    let stat = text.replace("STATUS:", "");
-                    println!("GOT STATUS: {}", stat);
-                    if (stat == "TRUE") {
-                        self.comm_sender.send(stat).unwrap()
-                    } else {
-                        self.comm_sender.send("FALSE".to_string()).unwrap()
+                } else if text == "IMAGESUBSCRIBE" {
+                    let mut started = self.sub_started.lock().unwrap();
+                    self.img_subscribers.lock().unwrap().push(ctx.address());
+
+                    if !*started {
+                        println!("Adding sub thread");
+                        *started = true;
+                        drop(started);
+                        let sbs = Arc::clone(&self.img_subscribers);
+                        let cnfig_inner = Arc::clone(&self.config);
+                        let hwnd = Arc::clone(&self.sub_hwnd);
+                        let crop = Arc::clone(&self.img_crop);
+                        thread::spawn(move || {
+                            let mut refresh = cnfig_inner.lock().unwrap().refresh_rate.clone();
+                            let mut inner_subs = Arc::clone(&sbs).lock().unwrap().clone();
+                            let mut inner_hwnd = Arc::clone(&hwnd).lock().unwrap().clone();
+                            let mut inner_crop = Arc::clone(&crop).lock().unwrap().clone();
+
+                            let mut counter = 500;
+                            loop {
+                                if counter % 10 == 0 {
+                                    println!("refreshing");
+                                    refresh = cnfig_inner.lock().unwrap().refresh_rate.clone();
+                                    let current_subs = Arc::clone(&sbs);
+                                    let mut subs_locked = current_subs.lock().unwrap();
+                                    let mut i = 0;
+                                    while i < subs_locked.len() {
+                                        if !subs_locked[i].connected() {
+                                            subs_locked.remove(i);
+                                        }else {
+                                            i += 1;
+                                        }
+                                    }
+                                    inner_subs = subs_locked.clone();
+                                    inner_hwnd = Arc::clone(&hwnd).lock().unwrap().clone();
+                                    inner_crop = Arc::clone(&crop).lock().unwrap().clone();
+                                    println!("CROP: {:?}", inner_crop);
+                                    //inner_hwnd = Arc::clone(&hwnd).lock().unwrap().clone();
+                                    println!("sub count: {}", inner_subs.len())
+                                }
+                                if inner_subs.len() > 0 {
+                                    let img =
+                                        ImageProcess::capture_instrument(
+                                            inner_hwnd, inner_crop).unwrap();
+
+                                    for i in 0..inner_subs.len() {
+                                        println!("{}", inner_hwnd);
+                                        if inner_hwnd != 0 {
+                                            let req =
+                                                inner_subs[i].try_send(BinaryMessage(img.clone()));
+                                            match req {
+                                                Ok(_) => {
+                                                    println!("img: OK");
+                                                }
+                                                Err(_) => {
+                                                    println!("img: ERR");
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                thread::sleep(std::time::Duration::from_millis(refresh as u64));
+                                counter += 1;
+                            }
+                        });
                     }
+                } else {
+                    self.comm_sender.send(text.to_string()).unwrap()
                 }
             }
             Ok(ws::Message::Binary(bin)) => ctx.binary(bin),
@@ -644,6 +763,11 @@ async fn ws_index(req: HttpRequest, stream: web::Payload, data: web::Data<AppSta
     let resp = ws::start(MyWs {
         command_receiver: rec,
         comm_sender: sndr,
+        img_subscribers: Arc::clone(&data.img_sub_status.img_sub_list),
+        sub_started: Arc::clone(&data.img_sub_status.thread_started),
+        config: data.config.clone(),
+        sub_hwnd: Arc::clone(&data.img_sub_status.selected_hwnd),
+        img_crop: Arc::clone(&data.img_sub_status.display_crop),
     }, &req, stream);
 
     println!("{:?}", resp);
@@ -698,6 +822,7 @@ pub async fn main() -> std::io::Result<()> {
     config.read_config();
     let (s, r) = bounded::<String>(0);
     let (sc, rc) = bounded::<String>(0);
+    let addon_config = AddonConfig::load().await;
     let state = web::Data::new(AppState {
         last_bytes: Mutex::from(Vec::new()),
         last_update: Mutex::from(Instant::now()),
@@ -708,24 +833,31 @@ pub async fn main() -> std::io::Result<()> {
         icon_png: include_bytes!("../../icon_compressed.png"),
         instrument_list: Mutex::from(vec![]),
         list_of_allowed_hwnd: Mutex::new(Vec::new()),
-        config: Mutex::from(config),
+        config: Arc::new(Mutex::from(config)),
         child_process: Mutex::from(Option::None),
-        selected_hwnd: Mutex::from(0),
+        //selected_hwnd: Mutex::from(0),
         command_sender: s,
         command_receiver: r,
         comm_sender: sc,
         comm_receiver: rc,
+        current_aircraft: Mutex::new("".to_string()),
         bridge_status: Mutex::from(BridgeStatus {
             connected: false,
             started: false,
-            comm: false
+            comm: false,
         }),
+        img_sub_status: ImageSubscriptionStatus {
+            thread_started: Arc::new(Mutex::new(false)),
+            img_sub_list: Arc::new(Mutex::new(vec![])),
+            selected_hwnd: Arc::new(Mutex::new(0)),
+            display_crop: Arc::new(Mutex::new([[0, 0], [0, 0]])),
+        },
+        addon_config,
+
     });
     let static_path: String = get_static_folder();
-    
-    
-    
-    
+
+
     HttpServer::new(move || {
         let cors = Cors::permissive();
         App::new()

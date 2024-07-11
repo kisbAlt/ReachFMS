@@ -1,10 +1,16 @@
 ﻿using System.Runtime.InteropServices;
+using System.Xml.Serialization;
 using Microsoft.FlightSimulator.SimConnect;
 using SimConnector.MobiFlight.SimConnectMSFS;
 
 
 namespace SimConnector
 {
+    public enum DATA_REQUESTS
+    {
+        AIRCRAFT_LOADED
+    }
+
     public class WasmModuleClientData
     {
         public string NAME;
@@ -123,6 +129,7 @@ namespace SimConnector
 
 
         public string AircraftTitle = "";
+        public string AircraftFile = "";
         public void Init()
         {
             Console.WriteLine("Starting...");
@@ -212,6 +219,8 @@ namespace SimConnector
                     
                     m_oSimConnect.OnRecvQuit += new SimConnect.RecvQuitEventHandler(SimConnect_OnRecvQuit);
 
+                    m_oSimConnect.OnRecvSystemState +=Simconnect_OnRecvSystemState;
+
                     // Now the sim is running, request information on the user aircraft
                     m_oSimConnect.OnRecvSimobjectData += new SimConnect.RecvSimobjectDataEventHandler(SimConnect_RecvSimobjectData);
                     // Register aircraft name
@@ -242,6 +251,8 @@ namespace SimConnector
             var title = (StringData)data.dwData[0];
             AircraftTitle = title.sValue;
             AircraftChanged?.Invoke(this, title.sValue);
+            m_oSimConnect.RequestSystemState(DATA_REQUESTS.AIRCRAFT_LOADED, "AircraftLoaded");
+            Console.WriteLine("SystemState requested");
         }
 
         private void SimConnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
@@ -540,6 +551,13 @@ namespace SimConnector
             return true;
         }
 
+        public bool CustomWasm(string cmd)
+        {
+            WasmModuleClient.SetSimVar(m_oSimConnect, cmd, WasmRuntimeClientData);
+            return true;
+        }
+
+
         public bool PressL(string lvar)
         {
             WasmModuleClient.SetSimVar(m_oSimConnect, $"1 (>L:{lvar})", WasmRuntimeClientData);
@@ -550,6 +568,21 @@ namespace SimConnector
         {
             WasmModuleClient.SetSimVar(m_oSimConnect, $"0 (>L:{lvar})", WasmRuntimeClientData);
             return true;
+        }
+        private async void Simconnect_OnRecvSystemState(SimConnect sender, SIMCONNECT_RECV_SYSTEM_STATE data)
+        {
+            switch (data.dwRequestID)
+            {
+                case (int)DATA_REQUESTS.AIRCRAFT_LOADED:
+                    if (!string.IsNullOrEmpty(data.szString))
+                    {
+                        Console.WriteLine($"Received aircraft  {data.szString}");
+
+                        this.AircraftFile = data.szString;
+
+                    }
+                    break;
+            }
         }
     }
 }
