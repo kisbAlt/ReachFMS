@@ -43,8 +43,8 @@ impl AddonConfig {
             Ok(res) => {
                 if res.version > stored.version {
                     Self::write_config(&res);
-                    Self::download_svgs(&res);
-                    return res
+                    Self::download_svgs(&res).await;
+                    return res;
                 }
                 stored
             }
@@ -117,9 +117,13 @@ impl AddonConfig {
         return match resp {
             Ok(resp) => {
                 println!("got serv resp");
-                let txt = resp.text().await.unwrap();
-                let deserialized: AddonConfig = serde_json::from_str(&txt).unwrap();
-                Ok(deserialized)
+                return match resp.text().await {
+                    Ok(txt) => {
+                        let deserialized: AddonConfig = serde_json::from_str(&txt).unwrap();
+                        Ok(deserialized)
+                    }
+                    Err(_) => { Err(false) }
+                };
             }
             Err(..) => {
                 Err(false)
@@ -137,7 +141,7 @@ impl AddonConfig {
         }
     }
 
-    fn get_aircraft_config(&self, aircraft_filename: String) -> Option<&AircraftAddon> {
+    fn get_aircraft_config(&self, aircraft_filename: &String) -> Option<&AircraftAddon> {
         for aircraft_addon in &self.aircraft_addons {
             if aircraft_filename.contains(&aircraft_addon.title) {
                 return Option::from(aircraft_addon);
@@ -146,25 +150,36 @@ impl AddonConfig {
         Option::None
     }
 
-    pub fn get_var(&self, btn: String, aircraft_filename: String) -> &str {
-        return match self.get_aircraft_config(aircraft_filename) {
-            None => { "" }
+    pub fn get_var(&self, btn: String, aircraft_filename: String) -> String {
+        return match self.get_aircraft_config(&aircraft_filename) {
+            None => { "".to_string() }
             Some(aircraft_addon) => {
+                let release_search = btn.clone() + ":REL";
+
+                let mut main_var = "";
+                let mut release_var = "";
+
                 for button_action in &aircraft_addon.button_actions {
                     if button_action.button == btn {
-                        return &*button_action.lvar;
+                        main_var = &*button_action.lvar;
+                    } else if button_action.button == release_search {
+                        println!("found release");
+                        release_var = &*button_action.lvar;
                     }
                 }
-                ""
+                if release_var != "" {
+                    return main_var.to_string() + release_var
+                }
+                return main_var.to_string();
             }
         };
     }
 
-    pub fn calculate_crop(&self, aircraft_filename: String, width: isize, height: isize) -> [[i32; 2]; 2] {
+    pub fn calculate_crop(&self, aircraft_filename: &String, width: isize, height: isize) -> [[i32; 2]; 2] {
         // [[cropx, cropy],[cropwidth, cropheight]]
-        
-        let mut crop: [[i32; 2]; 2] = [[0,0], [0,0]];
-        match self.get_aircraft_config(aircraft_filename) {
+
+        let mut crop: [[i32; 2]; 2] = [[0, 0], [0, 0]];
+        match self.get_aircraft_config(&aircraft_filename) {
             None => {}
             Some(aircraft_addon) => {
                 let img_aspect: f64 = (width as f64) / (height as f64);

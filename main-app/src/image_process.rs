@@ -1,6 +1,5 @@
-use std::io::{BufWriter, Cursor};
 use std::{mem};
-use image::{ImageFormat, Luma, RgbaImage};
+use image::{RgbaImage};
 use win_screenshot::prelude::*;
 use serde::{Deserialize, Serialize};
 use windows::{
@@ -32,13 +31,6 @@ pub struct InstrumentResponse {
     pub jpeg_bytes: Vec<u8>,
 }
 
-pub struct InstrumentPosition {
-    top: i32,
-    left: i32,
-    width: i32,
-    height: i32,
-    hwnd: isize,
-}
 
 const USING: Using = Using::PrintWindow;
 const AREA: Area = Area::ClientOnly;
@@ -49,7 +41,8 @@ impl ImageProcess {
     // pub fn init() -> Self {
     //     Self {}
     // }
-    pub fn start() -> Vec<InstrumentRgb> {
+    pub fn start(auto_hide: Option<bool>,
+                 selected_hwnd: Option<isize>) -> Vec<InstrumentRgb> {
         let av_hw = ImageProcess::find_popup_windows();
         let mut rgb_list: Vec<InstrumentRgb> = Vec::new();
         if av_hw.len() == 0 { return rgb_list; }
@@ -63,25 +56,52 @@ impl ImageProcess {
                                         Area::ClientOnly, None, None).unwrap();
             let img = RgbaImage::from_raw(buf.width, buf.height, buf.pixels).unwrap();
 
-            let instr: String = "MCDU".to_string();
             let current = InstrumentRgb {
                 hwnd: *hw,
                 height: img.height() as u16,
                 width: img.width() as u16,
                 crop: ImageProcess::find_crop_for_instruments(img.width(), img.height()),
-                instrument: instr,
+                instrument: "UNKNOWN".to_string(),
                 jpeg_bytes: buf2.unwrap(),
                 auto_hide: true,
                 excluded: false,
             };
             rgb_list.push(current);
         }
+        if av_hw.len() == 1 || selected_hwnd.is_some() {
+            match auto_hide {
+                None => {}
+                Some(hide_res) => unsafe {
+                    let mut hw: isize = 0;
+                    if av_hw.len() == 1 {
+                        hw = av_hw[0];
+                    } else {
+                        hw = selected_hwnd.unwrap_or(0);
+                    }
+                    println!("selected hwnd: {}", hw);
+                    for rgb in &mut rgb_list {
+                        if rgb.hwnd == hw {
+                            println!("setting MCDU:  {}", rgb.hwnd);
+                            rgb.instrument = "MCDU".parse().unwrap();
+
+                            if hide_res {
+                                ImageProcess::hide_window(hw)
+                            } else {
+                                let wsize = ImageProcess::get_window_pos(hw);
+                                ImageProcess::move_window(hw, wsize.top, wsize.left, 700, 700);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ;
         rgb_list
     }
 
     fn find_crop_for_instruments(width: u32, height: u32) -> [[i32; 2]; 2] {
         let crop: [[i32; 2]; 2] = [[0, 0], [width as i32, height as i32]];
-        
+
 
         return if width == height {
             crop
@@ -92,62 +112,21 @@ impl ImageProcess {
             let crop_pixels = height - width;
             [[0, (crop_pixels / 2) as i32], [width as i32, width as i32]]
         };
-
-        // else if instrument == "MCDU".to_string() {
-        //     // } else if (img_height / img_width) > 1.3 {
-        //     let mcdu_ratio: f32 = 0.866;
-        //     if width as f32 * mcdu_ratio < height as f32 {
-        //         let correct_height = width as f32 * mcdu_ratio;
-        //         let gap = height as f32 - correct_height;
-        //         return [[0, (gap / 2.0) as i32], [width as i32, correct_height as i32]];
-        //     } else if height as f32 / mcdu_ratio < width as f32 {
-        //         let correct_width = height as f32 / mcdu_ratio;
-        //         let gap = width as f32 - correct_width;
-        //         return [[(gap / 2.0) as i32, 0], [correct_width as i32, height as i32]];
-        //     }
-        // }
-
-        crop
     }
 
-    // fn template_match_instrument(bw_img: ImageBuffer<Luma<f32>, Vec<f32>>) -> String {
-    //     let path_list = Vec::from(["data/samples/template_L_ECAM.png", "data/samples/template_U_ECAM.png", "data/samples/template_PFD.png", "data/samples/template_ND.png"]);
-    // 
-    //     let t_definitions: [String; 4] =
-    //         ["L_ECAM".to_string(), "U_ECAM".to_string(), "PFD".to_string(), "ND".to_string()];
-    // 
-    //     let mut match_num = 0;
-    //     for t in path_list {
-    //         if t == "" {continue}
-    //         if Path::new(t).exists(){
-    //             // let template = image::open(t).unwrap().to_luma32f();
-    //             // let result = match_template(&bw_img, &template, MatchTemplateMethod::SumOfSquaredDifferences);
-    //             // let extremes = find_extremes(&result);
-    //             // if extremes.min_value < 1.0 {
-    //             //     break;
-    //             // }
-    //             break;
-    // 
-    //         }
-    //         match_num += 1
-    //     }
-    //     if match_num > t_definitions.len() - 1 {
-    //         return "".to_string();
-    //     }
-    //     t_definitions[match_num].clone()
-    // }
-
     pub unsafe fn hide_window(hwnd_in: isize) {
-        let hwnda_to_move: HWND = mem::transmute(hwnd_in);
-        let height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-        SetWindowPos(hwnda_to_move, hwnda_to_move,
-                     0, height + 50, 700, 700, SWP_NOREDRAW | SWP_NOZORDER | SWP_NOACTIVATE);
+        if hwnd_in != 0 {
+            let hwnda_to_move: HWND = mem::transmute(hwnd_in);
+            let height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+            SetWindowPos(hwnda_to_move, hwnda_to_move,
+                         0, height + 50, 700, 700, SWP_NOREDRAW | SWP_NOZORDER | SWP_NOACTIVATE).expect("Cant set window pos");
+        }
     }
 
     pub unsafe fn get_window_pos(hwnd_in: isize) -> RECT {
         let hwnda_to_move: HWND = mem::transmute(hwnd_in);
         let mut rrval: RECT = RECT::default();
-        GetWindowRect(hwnda_to_move, &mut rrval);
+        GetWindowRect(hwnda_to_move, &mut rrval).expect("Cant get window rect");
         rrval
     }
 
@@ -155,12 +134,14 @@ impl ImageProcess {
         let hwnda_to_move: HWND = mem::transmute(hwnd_in);
         SetWindowPos(hwnda_to_move, hwnda_to_move,
                      move_left, move_top, move_width, move_height,
-                     SWP_NOREDRAW | SWP_NOZORDER | SWP_NOACTIVATE);
+                     SWP_NOREDRAW | SWP_NOZORDER | SWP_NOACTIVATE).expect("Cant move window!");
     }
 
     pub fn find_popup_windows() -> Vec<isize> {
         let mut process_ls = Vec::<isize>::new();
+        println!("wndow llist");
         let ls = window_list().unwrap();
+        println!("wndow llist done");
         for i in ls {
             if i.window_name == "WASMINSTRUMENT" {
                 let hwnd = i.hwnd;
@@ -219,32 +200,10 @@ impl ImageProcess {
         Ok(outputasd)
     }
 
-    pub fn capture_instrument_sample(hwnd: isize, instrument: &str) -> &str {
-        if instrument == "MCDU" {
-            return "success";
-        }
-
-        if hwnd == 0 {
-            return "error";
-        }
-        let crop: [[i32; 2]; 2] = match instrument {
-            "PFD" => [[284, 142], [29, 15]],
-            "ND" => [[12, 2], [34, 24]],
-            "L_ECAM" => [[227, 566], [230, 23]],
-            "U_ECAM" => [[18, 398], [79, 26]],
-            _ => [[0, 0], [0, 0]],
-        };
-        let buf = match ImageProcess::capture_instrument(hwnd, crop) {
-            Ok(res) => res,
-            Err(..) => return "error"
-        };
-
-        std::fs::write(format!("data/samples/template_{}.png", instrument), buf).unwrap();
-        "ok"
-    }
-    
     pub fn restore_all() {
         let poputs = ImageProcess::find_popup_windows();
+
+        println!("moving windows");
         for popout in poputs {
             unsafe { ImageProcess::move_window(popout, 0, 0, 700, 700) }
         }

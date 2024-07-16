@@ -66,11 +66,6 @@ export async function instrExclude(hwnd, excluded) {
         `/set_hwnd_settings?hwnd=${hwnd}&excluded=${excluded}`)).text()
 }
 
-export async function sendCalibration(calibstr) {
-    return (await fetch(process.env.REACT_APP_LOCALHOST_PREFIX +
-        `/calibrate_displays?calibratestr=${calibstr}`)).text()
-}
-
 export async function getAddonConfig() {
     return (await fetch(process.env.REACT_APP_LOCALHOST_PREFIX +
         `/static/addon_config.json`)).json()
@@ -79,4 +74,8 @@ export async function getAddonConfig() {
 export async function getAircraftFile() {
     return (await fetch(process.env.REACT_APP_LOCALHOST_PREFIX +
         `/get_aircraft`)).text()
+}
+export async function setFMS(hwnd) {
+    return (await fetch(process.env.REACT_APP_LOCALHOST_PREFIX +
+        `/set_hwnd?hwnd=${hwnd}`)).text()
 }

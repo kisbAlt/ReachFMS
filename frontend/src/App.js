@@ -1,11 +1,10 @@
 import './App.css';
 import {useState, useEffect, useRef} from "react";
 import {McduComponent} from "./components/mcdu";
-import {forceInstruments, getInstruments, getStatus, setHwnd} from "./api_handler";
+import {forceInstruments, getInstruments, getStatus, setFMS, setHwnd} from "./api_handler";
 import {SettignsComponent} from "./components/settings";
 import {LoadingComponent} from "./components/loadingComponent";
-import {LoverEcam} from "./components/lowerEcam";
-import {CalibrationComponent} from "./components/CalibrationComponent";
+import {SelectFMS} from "./components/selectFMS";
 
 function sleep(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
@@ -13,7 +12,6 @@ function sleep(time) {
 
 function App() {
     const [fullScreenMode, setFullScreenMode] = useState(false)
-    const [displayOnly, setDisplayOnly] = useState(null)
     const [foundInstrumentObjects, setfoundInstrumentObjects] = useState([])
     const [selectedInstrument, setSelectedInstrument] = useState("Settings");
     const [selectedInstrumentId, setSelectedInstrumentId] = useState(0);
@@ -21,9 +19,9 @@ function App() {
     const [selectedRefreshRateMs, setSelectedRefreshRateMs] = useState(200);
     const [notifMessage, setNotifMessage] = useState("");
     const [selectedHwnd, setSelectedHwnd] = useState(0);
-    const [calibrated, setCalibrated] = useState(true)
-    const [fpsStart, setFpsStart] = useState(new Date());
     const [showFps, setShowFps] = useState(false);
+    const [FmsFound, setFmsFound] = useState(true);
+
     const showFps_ref = useRef();
     showFps_ref.current = showFps;
     const [frameNum, setFrameNum] = useState(0);
@@ -45,12 +43,9 @@ function App() {
 
     function instrumentMenuSelectHandler(instrument) {
         setFrameNum(0);
-        setFpsStart(new Date());
         setSelectedInstrument(instrument.instrument);
         setSelectedHwnd(instrument.hwnd)
         setSelectedInstrumentId(instrument.hwnd)
-        setHwnd(instrument.hwnd)
-
     }
 
     function showNotification(message, error = false, length_s = 2) {
@@ -77,11 +72,18 @@ function App() {
             resp = await getInstruments();
 
         }
+
         var local_list = []
+        console.log(resp)
         setfoundInstrumentObjects(resp)
+        var valid_istr = false;
         for (let i = 0; i < resp.length; i++) {
-            local_list.push(resp[i].instrument)
+            if (resp[i].instrument != "UNKNOWN") {
+                local_list.push(resp[i].instrument)
+                valid_istr = true;
+            }
         }
+        setFmsFound(valid_istr)
         if (local_list.filter(x => x === "MCDU").length > 1) {
             let message = "It seems like the display detection is not working correctly. " +
                 "Make sure that alternate renderer option below is enabled if you using it in the fenix app."
@@ -107,12 +109,10 @@ function App() {
         const urlParams = new URLSearchParams(window.location.search);
         const dispParam = urlParams.get('display_only');
         if (dispParam !== null) {
-            setDisplayOnly(dispParam)
             var status = getStatus().then(async (res) => {
                 var settings = res.settings;
                 changeRefreshRate(settings.refresh_rate)
                 setTiffUsage(!settings.max_fps)
-                setCalibrated(true)
                 let fnd = await refreshInstruments()
                 for (let i = 0; i < fnd.length; i++) {
                     if (fnd[i].instrument === dispParam) {
@@ -132,7 +132,7 @@ function App() {
     }, []);
 
     if (new URLSearchParams(window.location.search).get('display_only') == null) {
-        return (
+        return (FmsFound || foundInstrumentObjects.length == 0) ? (
 
             <div style={{
                 backgroundColor: "#0b0f12",
@@ -194,12 +194,11 @@ function App() {
                     flexWrap: "wrap",
                     zIndex: "10000000",
                 }}>
+                    <div style={{marginLeft: '10px'}}>
                     <img alt={"mcdu"} src={process.env.REACT_APP_LOCALHOST_PREFIX + "/icon.png"} onClick={() => {
                         setShowFps(true)
                     }}
-                         style={{height: "55px", marginTop: "auto", marginBottom: "auto"}}/>
-                    <div style={{marginLeft: '10px'}}>
-                        <p style={{textAlign: "left", marginTop: "5px", fontSize: "large"}}>Remote MCDU</p>
+                         style={{height: "32px", marginTop: "auto", marginBottom: "auto"}}/>
                         <p style={{fontSize: "small", textAlign: "left"}}>By <a rel="noreferrer"
                                                                                 style={{
                                                                                     color: "cornflowerblue",
@@ -241,7 +240,7 @@ function App() {
                             marginRight: "5px"
                         }}></div>
                         {foundInstrumentObjects.map((item, i) => {
-                            return item.excluded ? ("") : (
+                            return item.instrument == "UNKNOWN" ? ("") : (
                                 <div key={i} onClick={() => {
                                     instrumentMenuSelectHandler(item)
                                 }} className={"menudiv"} style={{
@@ -262,9 +261,7 @@ function App() {
                         {
                             'Settings': (
                                 //<McduComponent fullScreenMode={fullScreenMode} useTif={useTiff}/>
-                                <SettignsComponent setCalibratedFalse={() => {
-                                    setCalibrated(false)
-                                }}
+                                <SettignsComponent
                                                    instrumentObjects={foundInstrumentObjects}
                                                    showNotification={showNotification} setTiff={setTiffUsage}
                                                    setRefresh={changeRefreshRate} setInstrument={instrumentMenuSelectHandler}
@@ -272,8 +269,7 @@ function App() {
                                                        refreshInstruments(true)
                                                    }}/>
                             ),
-                            'PFD': (<McduComponent fullScreenMode={fullScreenMode} useTif={useTiff}/>),
-                            'L_ECAM': (<LoverEcam fullScreenMode={fullScreenMode} useTif={useTiff}/>),
+                            'MCDU': (<McduComponent fullScreenMode={fullScreenMode} useTif={useTiff}/>),
                         }[selectedInstrument] ?? (
                             <McduComponent fullScreenMode={fullScreenMode} useTif={useTiff}/>
 
@@ -351,24 +347,18 @@ function App() {
                           fill="#0D0C23"></path>
                 </svg>)}
             </div>
-        );
+        ) : (<SelectFMS instrumentObjects={foundInstrumentObjects} ></SelectFMS>)
 
     } else {
         return (
-            useTiff ? (<div style={{
-                    maxWidth: "100vw", maxHeight: fullScreenMode ? ("100vh") : ("80vh"), marginLeft: "auto",
-                    marginRight: "auto", height: '100%', width: "100%"
+            <img
+                style={{
+                    maxWidth: "100vw", maxHeight: fullScreenMode ? ("100vh") : ("80vh"),
+                    height: "auto"
                 }}
-                            id={"streamImage"}
-                            alt={"streamImage"}/>)
-                : (<img
-                    style={{
-                        maxWidth: "100vw", maxHeight: fullScreenMode ? ("100vh") : ("80vh"),
-                        height: "auto"
-                    }}
-                    id={"streamImage"}
-                    src={process.env.REACT_APP_LOCALHOST_PREFIX + "/get_image?hwnd=592236&rand="}
-                    alt={"streamImage"}/>)
+                id={"streamImage"}
+                src={process.env.REACT_APP_LOCALHOST_PREFIX + "/get_image?hwnd=592236&rand="}
+                alt={"streamImage"}/>
 
         )
     }

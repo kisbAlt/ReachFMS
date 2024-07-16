@@ -567,8 +567,8 @@
       "display_top": 11
     },
     {
-      "title": "B737",
-      "display": "PMDG 737-",
+      "title": "PMDG 737-",
+      "display": "PMDG 737",
       "button_actions": [
         {
           "button": "LSK1",
@@ -639,12 +639,12 @@
           "lvar": "55001 (>K:ROTOR_BRAKE)"
         },
         {
-          "button": "BRT+",
-          "lvar": "60501 (>K:ROTOR_BRAKE)"
+          "button": "BRT-",
+          "lvar": "60501 (>K:ROTOR_BRAKE) 60502 (>K:ROTOR_BRAKE)"
         },
         {
-          "button": "BRT-",
-          "lvar": "60502 (>K:ROTOR_BRAKE)"
+          "button": "BRT+",
+          "lvar": "60502 (>K:ROTOR_BRAKE) 60501 (>K:ROTOR_BRAKE)"
         },
         {
           "button": "MENU",
@@ -860,10 +860,12 @@
         }
       ],
       "svg_image": "737.svg",
-      "output_vars": ["(L:switch_6042_73X, number) 0 >"],
+      "output_vars": [
+        "(L:switch_6042_73X, number) 0 >"
+      ],
       "fms_aspect": 1.113,
-      "display_width": 235,
-      "display_top": 25
+      "display_width": 250,
+      "display_top": 43
     },
     {
       "title": "PMDG 777-",
@@ -1147,13 +1149,307 @@
         }
       ],
       "svg_image": "777.svg",
-      "output_vars": ["(L:switch_3491_a, number) 0 >"],
+      "output_vars": [
+        "(L:switch_3491_a, number) 0 >"
+      ],
+      "fms_aspect": 1.2602365787,
+      "display_width": 249,
+      "display_top": 50
+    },
+    {
+      "title": "INI A320",
+      "display": "iniBuilds A320",
+      "button_actions": [
+        {
+          "button": "65",
+          "lvar": "INI_MCDU1_A"
+        },
+        {
+          "button": "66",
+          "lvar": "INI_MCDU1_B"
+        },
+        {
+          "button": "67",
+          "lvar": "INI_MCDU1_C"
+        },
+        {
+          "button": "68",
+          "lvar": "INI_MCDU1_D"
+        },
+        {
+          "button": "69",
+          "lvar": "INI_MCDU1_E"
+        },
+        {
+          "button": "70",
+          "lvar": "INI_MCDU1_F"
+        },
+        {
+          "button": "71",
+          "lvar": "INI_MCDU1_G"
+        },
+        {
+          "button": "72",
+          "lvar": "INI_MCDU1_H"
+        },
+        {
+          "button": "73",
+          "lvar": "INI_MCDU1_I"
+        },
+        {
+          "button": "74",
+          "lvar": "INI_MCDU1_J"
+        },
+        {
+          "button": "75",
+          "lvar": "INI_MCDU1_K"
+        },
+        {
+          "button": "76",
+          "lvar": "INI_MCDU1_L"
+        },
+        {
+          "button": "77",
+          "lvar": "INI_MCDU1_M"
+        },
+        {
+          "button": "78",
+          "lvar": "INI_MCDU1_N"
+        },
+        {
+          "button": "79",
+          "lvar": "INI_MCDU1_O"
+        },
+        {
+          "button": "80",
+          "lvar": "INI_MCDU1_P"
+        },
+        {
+          "button": "81",
+          "lvar": "INI_MCDU1_Q"
+        },
+        {
+          "button": "82",
+          "lvar": "INI_MCDU1_R"
+        },
+        {
+          "button": "83",
+          "lvar": "INI_MCDU1_S"
+        },
+        {
+          "button": "84",
+          "lvar": "INI_MCDU1_T"
+        },
+        {
+          "button": "85",
+          "lvar": "INI_MCDU1_U"
+        },
+        {
+          "button": "86",
+          "lvar": "INI_MCDU1_V"
+        },
+        {
+          "button": "87",
+          "lvar": "INI_MCDU1_W"
+        },
+        {
+          "button": "88",
+          "lvar": "INI_MCDU1_X"
+        },
+        {
+          "button": "89",
+          "lvar": "INI_MCDU1_Y"
+        },
+        {
+          "button": "90",
+          "lvar": "INI_MCDU1_Z"
+        },
+        {
+          "button": "47",
+          "lvar": "INI_MCDU1_SLASH"
+        },
+        {
+          "button": "32",
+          "lvar": "INI_MCDU1_SPACE"
+        },
+        {
+          "button": "110",
+          "lvar": "INI_MCDU1_OVERFLY"
+        },
+        {
+          "button": "8",
+          "lvar": "INI_MCDU1_CLR"
+        },
+        {
+          "button": "112",
+          "lvar": "INI_MCDU1_LSK1L"
+        },
+        {
+          "button": "113",
+          "lvar": "INI_MCDU1_LSK2L"
+        },
+        {
+          "button": "114",
+          "lvar": "INI_MCDU1_LSK3L"
+        },
+        {
+          "button": "115",
+          "lvar": "INI_MCDU1_LSK4L"
+        },
+        {
+          "button": "116",
+          "lvar": "INI_MCDU1_LSK5L"
+        },
+        {
+          "button": "117",
+          "lvar": "INI_MCDU1_LSK6L"
+        },
+        {
+          "button": "120",
+          "lvar": "INI_MCDU1_LSK1R"
+        },
+        {
+          "button": "121",
+          "lvar": "INI_MCDU1_LSK2R"
+        },
+        {
+          "button": "122",
+          "lvar": "INI_MCDU1_LSK3R"
+        },
+        {
+          "button": "123",
+          "lvar": "INI_MCDU1_LSK4R"
+        },
+        {
+          "button": "124",
+          "lvar": "INI_MCDU1_LSK5R"
+        },
+        {
+          "button": "125",
+          "lvar": "INI_MCDU1_LSK6R"
+        },
+        {
+          "button": "98",
+          "lvar": "INI_MCDU1_DIR"
+        },
+        {
+          "button": "99",
+          "lvar": "INI_MCDU1_PROG"
+        },
+        {
+          "button": "100",
+          "lvar": "INI_MCDU1_PERF"
+        },
+        {
+          "button": "101",
+          "lvar": "INI_MCDU1_INIT"
+        },
+        {
+          "button": "102",
+          "lvar": "INI_MCDU1_DATA"
+        },
+        {
+          "button": "103",
+          "lvar": "INI_MCDU1_FPLAN"
+        },
+        {
+          "button": "104",
+          "lvar": "INI_MCDU1_RADNAV"
+        },
+        {
+          "button": "105",
+          "lvar": "INI_MCDU1_FUEL"
+        },
+        {
+          "button": "106",
+          "lvar": "INI_MCDU1_SEC"
+        },
+        {
+          "button": "107",
+          "lvar": "INI_MCDU1_ATC"
+        },
+        {
+          "button": "108",
+          "lvar": "INI_MCDU1_AIRPROT"
+        },
+        {
+          "button": "96",
+          "lvar": "INI_MCDU2_MENU"
+        },
+        {
+          "button": "94",
+          "lvar": "INI_MCDU1_UARROW"
+        },
+        {
+          "button": "95",
+          "lvar": "INI_MCDU1_LEFT"
+        },
+        {
+          "button": "30",
+          "lvar": "INI_MCDU1_DOWN"
+        },
+        {
+          "button": "31",
+          "lvar": "INI_MCDU1_RIGHT"
+        },
+        {
+          "button": "49",
+          "lvar": "INI_MCDU1_1"
+        },
+        {
+          "button": "50",
+          "lvar": "INI_MCDU1_2"
+        },
+        {
+          "button": "51",
+          "lvar": "INI_MCDU1_3"
+        },
+        {
+          "button": "52",
+          "lvar": "INI_MCDU1_4"
+        },
+        {
+          "button": "53",
+          "lvar": "INI_MCDU1_5"
+        },
+        {
+          "button": "54",
+          "lvar": "INI_MCDU1_6"
+        },
+        {
+          "button": "55",
+          "lvar": "INI_MCDU1_7"
+        },
+        {
+          "button": "56",
+          "lvar": "INI_MCDU1_8"
+        },
+        {
+          "button": "57",
+          "lvar": "INI_MCDU1_9"
+        },
+        {
+          "button": "48",
+          "lvar": "INI_MCDU1_0"
+        },
+        {
+          "button": "46",
+          "lvar": "INI_MCDU2_DOT"
+        },
+        {
+          "button": "36",
+          "lvar": "INI_MCDU1_MINUS"
+        }
+      ],
+      "svg_image": "a320.svg",
+      "output_vars": [
+      ],
       "fms_aspect": 1.2602365787,
       "display_width": 249,
       "display_top": 50
     }
   ],
-  "version": 4,
+  "version": 5,
   "app_version": 0,
   "updated": "date"
 }

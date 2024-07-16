@@ -29,7 +29,6 @@ export function SettignsComponent(props) {
     const [alternateChecked, setAlternateChecked] = useState(false)
     const [multipleChecked, setMultipleChecked] = useState(true)
     const [bridgeConnected, setBridgeConnected] = useState(false)
-    const [fenixSelected, setFenixSelected] = useState(false)
     const [loadedAircraft, setLoadedAircraft] = useState("")
     const [instrumentSettings, setInstrumentSettings] = useState([])
     const [autoStartServer, setAutoStartServer] = useState(false)
@@ -51,13 +50,6 @@ export function SettignsComponent(props) {
         }
     }
 
-    function checkerHandlerMax() {
-        if (maxChecked) {
-            setMaxChecked(false)
-        } else {
-            setMaxChecked(true)
-        }
-    }
     function checkerHandlerMultiple() {
         if (multipleChecked) {
             setMultipleChecked(false)
@@ -65,14 +57,6 @@ export function SettignsComponent(props) {
             setMultipleChecked(true)
         }
     }
-    function checkerHandlerAlternate() {
-        if (alternateChecked) {
-            setAlternateChecked(false)
-        } else {
-            setAlternateChecked(true)
-        }
-    }
-
     async function reconnect() {
         await reconnectBridge();
         await loadSave();
@@ -92,7 +76,7 @@ export function SettignsComponent(props) {
                 refresh_rate = 100;
                 break;
             case "veryfast":
-                refresh_rate = 10;
+                refresh_rate = 50;
                 break;
             default:
                 refresh_rate = 200;
@@ -107,6 +91,7 @@ export function SettignsComponent(props) {
 
     async function loadSave() {
         var status = await getStatus();
+        console.log(status)
         var settings = status.settings;
         var refresh_setting = "normal"
 
@@ -121,7 +106,7 @@ export function SettignsComponent(props) {
             case 100:
                 refresh_setting = "fast";
                 break;
-            case 10:
+            case 50:
                 refresh_setting = "veryfast";
                 break;
             default:
@@ -306,29 +291,9 @@ export function SettignsComponent(props) {
                             backgroundColor: "black"
                         }}>
                             <p>{item.instrument}</p>
-                            <div style={{height: "20px", width: "120px"}}>
-                                {autoChecked && (<div style={{
-                                    display: "inline-block", width: "59px", height: "20px", cursor: "pointer",
-                                    borderRight: "2px solid white",
-                                    backgroundColor: item.auto_hide ? ("green") : ("red")
-                                }} onClick={() => {
-                                    autoHideInstrument(item.hwnd)
-                                }}>
-                                    <p style={{fontSize: "small"}}>Autohide</p>
-                                </div>)}
-                                <div onClick={() => {
-                                    excludeInstrument(item.hwnd)
-                                }}
-                                     style={{
-                                         display: "inline-block", width: "59px", height: "20px", cursor: "pointer",
-                                         backgroundColor: item.excluded ? ("red") : ("green")
-                                     }}>
-                                    <p style={{fontSize: "small"}}>{item.excluded ? ("Excluded") : ("Included")}</p>
-                                </div>
-                            </div>
                             <img alt={item.instrument} style={{cursor: "pointer"}} width={"120px"} height={"120px"}
                                  onClick={() => {
-                                     if (!item.excluded) {
+                                     if (item.instrument != "UNKNOWN") {
                                          props.setInstrument(item)
                                      }
                                  }}
@@ -346,14 +311,6 @@ export function SettignsComponent(props) {
                 marginLeft: "auto",
                 marginRight: "auto"
             }}>
-                {/*<div style={{display: "flex", alignItems: "baseline"}}>*/}
-                {/*    <p className={"settigns-left"}>Alternate renderer enabled in the fenix app:*/}
-                {/*        <span*/}
-                {/*            style={{fontSize: "small", marginLeft: "5px", color: "yellow"}}>*/}
-                {/*        (Check your fenix app if the display recognition is not accurate)</span></p>*/}
-                {/*    <input onChange={checkerHandlerAlternate} style={{width: "15px", height: "15px"}}*/}
-                {/*           className={'settings-right'} type="checkbox" name="checkbox-checked" checked={alternateChecked}/>*/}
-
 
                 {/*</div>*/}
                 <div style={{display: "flex", alignItems: "baseline"}}>
@@ -368,28 +325,8 @@ export function SettignsComponent(props) {
                     </div>
                 </div>
 
-                {/*<div style={{display: "flex", alignItems: "baseline"}}>*/}
-                {/*    <p className={"settigns-left"}>Maximum performance:*/}
-                {/*        <span*/}
-                {/*            style={{fontSize: "small", marginLeft: "5px", color: "yellow"}}>*/}
-                {/*        (Will drastically improve refresh-rate but will use much more CPU, unticking this currently may cause unstable behaviour)</span>*/}
-                {/*    </p>*/}
-                {/*    <input onChange={checkerHandlerMax} style={{width: "15px", height: "15px"}}*/}
-                {/*           className={'settings-right'} type="checkbox" name="checkbox-checked" checked={maxChecked}/>*/}
-
-
                 {/*</div>*/}
 
-                <div style={{display: "flex", alignItems: "baseline"}}>
-                    <p className={"settigns-left"}>Allow multiple simultaneous displays:
-                        <span
-                            style={{fontSize: "small", marginLeft: "5px", color: "green"}}>
-                        (Disable this if you don't have a strong pc)</span></p>
-                    <input onChange={checkerHandlerMultiple} style={{width: "15px", height: "15px"}}
-                           className={'settings-right'} type="checkbox" name="checkbox-checked" checked={multipleChecked}/>
-
-
-                </div>
 
                 <div style={{display: "flex", alignItems: "baseline"}}>
                     <p className={"settigns-left"}>Hide pop-outs automatically:
@@ -419,16 +356,7 @@ export function SettignsComponent(props) {
                     borderRadius: "5px",
                 }}>Save</p>
 
-                <p onClick={() => {window.location = "/?calibration=true"}} style={{
-                    cursor: "pointer",
-                    marginTop: "35px",
-                    padding: "7px",
-                    backgroundColor: "indigo",
-                    width: "fit-content",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                    borderRadius: "5px",
-                }}>Calibration</p>
+
             </div>
             <p onClick={() => {
                 saveDebug()

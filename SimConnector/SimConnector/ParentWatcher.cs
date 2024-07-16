@@ -28,7 +28,7 @@ namespace SimConnector
         // Constants
         const uint PROCESS_QUERY_INFORMATION = 0x0400;
         const uint PROCESS_VM_READ = 0x0010;
-        const string _parent_process = "a320_remote_mcdu";
+        const string _parent_process = "reachfms";
         public static bool ParentRunning()
         {
             return IsProcessRunning(_parent_process);

@@ -172,7 +172,7 @@ export function McduComponent(props) {
                         position: "absolute", width: `${imgWidth}px`, left: "0", right: "0", marginLeft: "auto",
                         marginRight: "auto", marginTop: `${imgTop}px`
                     }}
-                         id={"streamImage"} src={process.env.REACT_APP_LOCALHOST_PREFIX + `/get_image`}
+                         id={"streamImage"}
                          alt={"streamImage"}/>
                 </div>
             </div>

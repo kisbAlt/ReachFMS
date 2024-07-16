@@ -11,16 +11,12 @@ use crate::{api_communicator, comm_sender, ImageProcess};
 use image::{RgbaImage};
 use image;
 use qstring::QString;
-use std::time::{Instant};
-use actix::dev::SendError;
 use actix_files::Files;
-use crossbeam_channel::{bounded, select, after};
-use fltk::image::Image;
+use crossbeam_channel::{bounded};
 use crate::config_handler::{ConfigHandler, DebugSave, get_static_folder};
 use crate::image_process::InstrumentRgb;
 use serde::{Deserialize, Serialize};
 use crate::addon_config::AddonConfig;
-
 #[derive(Serialize, Deserialize)]
 struct StatusResponse {
     bridge_status: BridgeStatus,
@@ -45,14 +41,9 @@ pub struct ImageSubscriptionStatus {
 
 struct AppState {
     last_bytes: Mutex<Vec<u8>>,
-    last_update: Mutex<Instant>,
     main_html_string: &'static str,
-    mcdu_svg: &'static str,
-    ecam_svg: &'static str,
-    tiff_js: &'static str,
     icon_png: &'static [u8],
     instrument_list: Mutex<Vec<InstrumentRgb>>,
-    list_of_allowed_hwnd: Mutex<Vec<isize>>,
     config: Arc<Mutex<ConfigHandler>>,
     child_process: Mutex<Option<Child>>,
     //selected_hwnd: Mutex<isize>,
@@ -77,17 +68,6 @@ async fn index(data: web::Data<AppState>) -> impl Responder {
         drop(child_proc);
         HttpResponse::Ok().body(data.main_html_string)
     }
-}
-
-
-#[get("/ecam.svg")]
-async fn ecam_svg(data: web::Data<AppState>) -> impl Responder {
-    HttpResponse::Ok().body(data.ecam_svg)
-}
-
-#[get("/tiff.min.js")]
-async fn tiffjs(data: web::Data<AppState>) -> impl Responder {
-    HttpResponse::Ok().body(data.tiff_js)
 }
 
 #[get("/icon.png")]
@@ -125,50 +105,31 @@ async fn bridge_status(data: web::Data<AppState>) -> impl Responder {
 
 #[get("/stop_server")]
 async fn stop_server(data: web::Data<AppState>) -> impl Responder {
+    
+    println!("locking child_proc");
     let mut child_proc = data.child_process.lock().unwrap();
-    let state_instruments = data.instrument_list.lock().unwrap();
-    //let list_clone = hw_list.clone();
-    let config = data.config.lock().unwrap();
-    let do_restore = config.clone().auto_hide;
     if !child_proc.is_none() {
-        let mut windows_to_hide: Vec<isize> = Vec::new();
-        if do_restore {
-            for state in state_instruments.iter() {
-                if state.auto_hide {
-                    windows_to_hide.push(state.hwnd)
-                }
-            }
-        }
-        if do_restore {
-            for wn in windows_to_hide {
-                unsafe { ImageProcess::move_window(wn, 0, 0, 700, 700) }
-            }
-        }
+        println!("child_running");
         data.command_sender.send("CloseBridge".to_string()).expect("cannot send CloseBridge");
-
-        // std::thread::spawn(move || {
-        //     api_communicator::stop_bridge_process()
-        // }).join().unwrap();
-
         *child_proc = Option::None;
     } else {
+        println!("child not running");
         drop(child_proc);
         return HttpResponse::Ok().body("Not running");
     }
     drop(child_proc);
-    drop(state_instruments);
+    println!("Setting status");
     let mut brid_status = data.bridge_status.lock().unwrap().clone();
     brid_status.started = false;
     drop(brid_status);
 
+    println!("returning resp");
     HttpResponse::Ok().body("stopped")
 }
 
 #[get("/reconnect")]
-async fn bridge_reconnect() -> impl Responder {
-    let resp = std::thread::spawn(move || {
-        api_communicator::reconnect()
-    }).join().unwrap();
+async fn bridge_reconnect(data: web::Data<AppState>) -> impl Responder {
+    let resp: String = comm_sender::reconnect(data.command_sender.clone(), data.comm_receiver.clone());
     HttpResponse::Ok().body(resp)
 }
 
@@ -250,8 +211,8 @@ async fn set_settings(req: HttpRequest, data: web::Data<AppState>) -> impl Respo
         _ => { false }
     };
 
-    if refresh < 10 {
-        refresh = 10;
+    if refresh < 50 {
+        refresh = 50;
     }
 
     let mut conf = data.config.lock().unwrap();
@@ -287,8 +248,7 @@ async fn save_debug(data: web::Data<AppState>) -> impl Responder {
 
 
     let conf = data.config.lock().unwrap();
-    let temp_instr = ImageProcess::start();
-
+    let temp_instr = ImageProcess::start(Option::None, Option::None);
     let debug: DebugSave = DebugSave {
         instrument_list: ImageProcess::window_to_string(&temp_instr),
         config: conf.get_string(),
@@ -376,11 +336,8 @@ async fn restore_windows() -> HttpResponse {
 
 #[get("/hide_windows")]
 async fn hide_popout_windows(data: web::Data<AppState>) -> HttpResponse {
-    let hw_list = data.list_of_allowed_hwnd.lock().unwrap();
-    let list_clone = hw_list.clone();
-    for wn in list_clone {
-        unsafe { ImageProcess::hide_window(wn) }
-    }
+    let hw = data.img_sub_status.selected_hwnd.lock().unwrap();
+    unsafe { ImageProcess::hide_window(*hw); }
 
     HttpResponse::Ok().body("ok")
 }
@@ -389,48 +346,31 @@ async fn hide_popout_windows(data: web::Data<AppState>) -> HttpResponse {
 #[get("/get_windows")]
 async fn get_windows(data: web::Data<AppState>) -> HttpResponse {
     let mut state_instruments = data.instrument_list.lock().unwrap();
-    let mut hw_list = data.list_of_allowed_hwnd.lock().unwrap();
     let conf = data.config.lock().unwrap();
 
-    let wndows = ImageProcess::start();
-
-    if wndows.len() > 0 {
-        let selected_hwnd = wndows[0].hwnd;
-        let mut sub_hwnd = data.img_sub_status.selected_hwnd.lock().unwrap();
-        *sub_hwnd = selected_hwnd;
-        drop(sub_hwnd);
-
-        let aircraft: String = comm_sender::get_aircraft(&data.command_sender, &data.comm_receiver);
-        let mut saved = data.current_aircraft.lock().unwrap();
-        *saved = aircraft.clone();
-        drop(saved);
-
-        unsafe {
-            
-            if conf.auto_hide {
-                ImageProcess::hide_window(selected_hwnd)
-            }else {
-                let wsize = ImageProcess::get_window_pos(selected_hwnd);
-                ImageProcess::move_window(selected_hwnd, wsize.top, wsize.left, 700, 700);
-            }
-        };
-        let find_crop = data.addon_config.calculate_crop(aircraft,
-                                                         700, 700);
-        let mut crop = data.img_sub_status.display_crop.lock().unwrap();
-        *crop = find_crop;
-    }
-
-    let mut local_hwnd_list: Vec<isize> = Vec::new();
-    for i in &wndows {
-        local_hwnd_list.push(i.hwnd);
-    }
-    *hw_list = local_hwnd_list.clone();
-
+    
+    let aircraft: String = comm_sender::get_aircraft(&data.command_sender, &data.comm_receiver);
+    let mut saved = data.current_aircraft.lock().unwrap();
+    *saved = aircraft.clone();
+    drop(saved);
+    let sub_hwnd = data.img_sub_status.selected_hwnd.lock().unwrap().clone();
+    let wndows = ImageProcess::start(Option::from(conf.auto_hide), Option::from(sub_hwnd));
     let resp = ImageProcess::window_to_string(&wndows);
+
+    for img in &wndows {
+        if img.instrument == "MCDU" {
+            let mut sub_hwnd = data.img_sub_status.selected_hwnd.lock().unwrap();
+            *sub_hwnd = img.hwnd;
+            let find_crop = data.addon_config.calculate_crop(&aircraft,
+                                                             700, 700);
+            let mut crop = data.img_sub_status.display_crop.lock().unwrap();
+            *crop = find_crop;
+        }
+    }
+    
     *state_instruments = wndows;
     drop(state_instruments);
-
-
+    
     HttpResponse::Ok().body(resp)
 }
 
@@ -441,28 +381,6 @@ async fn get_aircraft(data: web::Data<AppState>) -> HttpResponse {
     *saved = aircraft.clone();
     return HttpResponse::Ok().body(aircraft);
 }
-
-#[get("/force_rescan")]
-async fn force_rescan(data: web::Data<AppState>) -> HttpResponse {
-    let mut state_instruments = data.instrument_list.lock().unwrap();
-    let mut hw_list = data.list_of_allowed_hwnd.lock().unwrap();
-    let conf = data.config.lock().unwrap();
-
-    let wndows = ImageProcess::start();
-
-    let mut local_hwnd_list: Vec<isize> = Vec::new();
-    for i in &wndows {
-        local_hwnd_list.push(i.hwnd);
-    }
-    *hw_list = local_hwnd_list.clone();
-
-    let resp = ImageProcess::window_to_string(&wndows);
-    *state_instruments = wndows;
-    drop(state_instruments);
-
-    HttpResponse::Ok().body(resp)
-}
-
 
 #[get("/set_min_capture_ms")]
 async fn set_min_capture_ms(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
@@ -494,121 +412,120 @@ async fn image_state(data: web::Data<AppState>) -> HttpResponse {
 
 #[get("/set_hwnd")]
 async fn set_hwnd(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
-    // let mut hwnd = data.selected_hwnd.lock().unwrap();
-    // let query_str = req.query_string(); // "name=ferret"
-    // let qs = QString::from(query_str);
-    // let hw_id = qs.get("hwnd").unwrap().parse::<u32>().unwrap_or(0) as isize;
-    //
-    // let allowed_hwnd = data.list_of_allowed_hwnd.lock().unwrap();
-    // if !allowed_hwnd.contains(&hw_id) {
-    //     return HttpResponse::Ok()
-    //         .body("Not allowed");
-    // }
-    // drop(allowed_hwnd);
-    //
-    // *hwnd = hw_id;
-    // drop(hwnd);
-    HttpResponse::Ok()
-        .body("ok")
-}
+    
+    let conf = data.config.lock().unwrap();
 
-
-#[get("/calibrate_displays")]
-async fn calibrate_displays(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
+    let aircraft: String = comm_sender::get_aircraft(&data.command_sender, &data.comm_receiver);
+    let mut saved = data.current_aircraft.lock().unwrap();
+    *saved = aircraft.clone();
+    drop(saved);
+    
     let query_str = req.query_string(); // "name=ferret"
     let qs = QString::from(query_str);
-    let hw_id = qs.get("calibratestr").unwrap_or("");
-    // str format: hwnd:INSTRUMENT;hwnd:INSTRUMENT
-
-
-    if hw_id == "" {
-        return HttpResponse::Ok()
-            .body("error");
-    }
-
-    let calibrate_list = hw_id.split(";");
-    for istr in calibrate_list {
-        let hwnd: isize = istr.split(":").collect::<Vec<&str>>()[0].parse::<isize>().unwrap_or(0);
-        println!("currently: {}", hwnd);
-        let instrument: &str = istr.split(":").collect::<Vec<&str>>()[1];
-        ImageProcess::capture_instrument_sample(hwnd, instrument);
-    }
-    let mut conf = data.config.lock().unwrap();
-    conf.calibrated = true;
-    conf.write_config();
-    drop(conf);
-
-
-    HttpResponse::Ok()
-        .body("ok")
-}
-
-
-#[get("/get_image")]
-async fn get_image(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
-    let mut lastupdate = data.last_update.lock().unwrap();
-    let min_ms = data.config.lock().unwrap();
-    // let send_format = match min_ms.max_fps {
-    //     true => ImageFormat::Jpeg,
-    //     false => ImageFormat::Tiff
-    // };
-    if !min_ms.multiple_displays && lastupdate.elapsed().as_millis() < min_ms.refresh_rate as u128 {
-        let last_bytes = data.last_bytes.lock().unwrap();
-        let bytes = last_bytes.clone();
-        drop(last_bytes);
-        return HttpResponse::Ok()
-            .body(bytes);
-    }
-    *lastupdate = Instant::now();
-
-    drop(lastupdate);
-    drop(min_ms);
-
-    //let hw_id = data.selected_hwnd.lock().unwrap().clone();
-    let query_str = req.query_string();
-    let qs = QString::from(query_str);
-    let hw_id: isize = qs.clone().get("hwnd").unwrap_or("0")
+    let hw_id = qs.get("hwnd").unwrap_or("0")
         .parse::<isize>().unwrap_or(0);
 
-    let mut crop = [[0, 0], [0, 0]];
+    let wndows = ImageProcess::start(Option::from(conf.auto_hide), Option::from(hw_id));
+    
 
-    let insr_list = data.instrument_list.lock().unwrap();
-    for instr in insr_list.iter() {
-        if instr.hwnd == hw_id {
-            crop = instr.crop;
+    for img in &wndows {
+        if img.instrument == "MCDU" {
+            let mut sub_hwnd = data.img_sub_status.selected_hwnd.lock().unwrap();
+            *sub_hwnd = img.hwnd;
+            let find_crop = data.addon_config.calculate_crop(&aircraft,
+                                                             700, 700);
+            let mut crop = data.img_sub_status.display_crop.lock().unwrap();
+            *crop = find_crop;
+            let mut state_instruments = data.instrument_list.lock().unwrap();
+            *state_instruments = wndows;
+            return HttpResponse::Ok()
+                .body("ok")
         }
     }
-
-    let resp = match ImageProcess::capture_instrument(hw_id, crop) {
-        Ok(tempresp) => tempresp,
-        Err(..) => return HttpResponse::Ok().body("HwndNotFound")
-    };
-    let mut last_bytes = data.last_bytes.lock().unwrap();
-    *last_bytes = resp.clone();
-    drop(last_bytes);
-
-
+    
     HttpResponse::Ok()
-        .body(resp)
+        .body("error")
 }
+// 
+// 
+// #[get("/calibrate_displays")]
+// async fn calibrate_displays(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
+//     let query_str = req.query_string(); // "name=ferret"
+//     let qs = QString::from(query_str);
+//     let hw_id = qs.get("calibratestr").unwrap_or("");
+//     // str format: hwnd:INSTRUMENT;hwnd:INSTRUMENT
+// 
+// 
+//     if hw_id == "" {
+//         return HttpResponse::Ok()
+//             .body("error");
+//     }
+// 
+//     let calibrate_list = hw_id.split(";");
+//     for istr in calibrate_list {
+//         let hwnd: isize = istr.split(":").collect::<Vec<&str>>()[0].parse::<isize>().unwrap_or(0);
+//         
+//         let instrument: &str = istr.split(":").collect::<Vec<&str>>()[1];
+//         ImageProcess::capture_instrument_sample(hwnd, instrument);
+//     }
+//     let mut conf = data.config.lock().unwrap();
+//     conf.calibrated = true;
+//     conf.write_config();
+//     drop(conf);
+// 
+// 
+//     HttpResponse::Ok()
+//         .body("ok")
+// }
 
-#[get("/test_ws")]
-async fn test_ws(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
-    // test
+// 
+// #[get("/get_image")]
+// async fn get_image(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
+//     let mut lastupdate = data.last_update.lock().unwrap();
+//     let min_ms = data.config.lock().unwrap();
+// 
+//     if !min_ms.multiple_displays && lastupdate.elapsed().as_millis() < min_ms.refresh_rate as u128 {
+//         let last_bytes = data.last_bytes.lock().unwrap();
+//         let bytes = last_bytes.clone();
+//         drop(last_bytes);
+//         return HttpResponse::Ok()
+//             .body(bytes);
+//     }
+//     *lastupdate = Instant::now();
+// 
+//     drop(lastupdate);
+//     drop(min_ms);
+// 
+//     //let hw_id = data.selected_hwnd.lock().unwrap().clone();
+//     let query_str = req.query_string();
+//     let qs = QString::from(query_str);
+//     let hw_id: isize = qs.clone().get("hwnd").unwrap_or("0")
+//         .parse::<isize>().unwrap_or(0);
+// 
+//     let mut crop = [[0, 0], [0, 0]];
+// 
+//     let insr_list = data.instrument_list.lock().unwrap();
+//     for instr in insr_list.iter() {
+//         if instr.hwnd == hw_id {
+//             crop = instr.crop;
+//         }
+//     }
+// 
+//     let resp = match ImageProcess::capture_instrument(hw_id, crop) {
+//         Ok(tempresp) => tempresp,
+//         Err(..) => return HttpResponse::Ok().body("HwndNotFound")
+//     };
+//     let mut last_bytes = data.last_bytes.lock().unwrap();
+//     *last_bytes = resp.clone();
+//     drop(last_bytes);
+// 
+// 
+//     HttpResponse::Ok()
+//         .body(resp)
+// }
 
-    let query_str = req.query_string();
-    let qs = QString::from(query_str);
-    let cmd: &str = qs.get("cmd").unwrap_or("");
 
-    let snd = data.command_sender.clone();
-    snd.send(format!("SM_SEND:{cmd}").parse().unwrap()).expect("ERROR SENDING STAT MSG");
-
-    // end test
-    return HttpResponse::Ok()
-        .body("sent.");
-}
-
-struct MyWs {
+pub struct MyWs {
     pub command_receiver: crossbeam_channel::Receiver<String>,
     pub comm_sender: crossbeam_channel::Sender<String>,
     pub img_subscribers: Arc<Mutex<Vec<Addr<MyWs>>>>,
@@ -654,7 +571,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
             Ok(ws::Message::Text(text)) => {
                 if text == "ConnectWSClient" {
                     let rx = self.command_receiver.clone();
-                    let sn = self.comm_sender.clone();
+                    //let sn = self.comm_sender.clone();
                     let addr = ctx.address().clone();
                     //let ctx_clone = ctx.deref().clone();
                     thread::spawn(move || {
@@ -668,7 +585,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
                             if value == "CloseBridge" {
                                 addr.do_send(StringConnectMessage("CLOSE".to_string()));
                             }
-                            if (value == "BridgeStatus") {
+                            if value == "BridgeStatus" {
                                 println!("Getting status...");
                                 addr.do_send(StringConnectMessage("STATUS".to_string()));
                             } else if value == "GetAircraft" {
@@ -702,7 +619,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
                             let mut counter = 500;
                             loop {
                                 if counter % 10 == 0 {
-                                    println!("refreshing");
                                     refresh = cnfig_inner.lock().unwrap().refresh_rate.clone();
                                     let current_subs = Arc::clone(&sbs);
                                     let mut subs_locked = current_subs.lock().unwrap();
@@ -710,16 +626,16 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
                                     while i < subs_locked.len() {
                                         if !subs_locked[i].connected() {
                                             subs_locked.remove(i);
-                                        }else {
+                                        } else {
                                             i += 1;
                                         }
                                     }
                                     inner_subs = subs_locked.clone();
                                     inner_hwnd = Arc::clone(&hwnd).lock().unwrap().clone();
                                     inner_crop = Arc::clone(&crop).lock().unwrap().clone();
-                                    println!("CROP: {:?}", inner_crop);
+                                    //println!("CROP: {:?}", inner_crop);
                                     //inner_hwnd = Arc::clone(&hwnd).lock().unwrap().clone();
-                                    println!("sub count: {}", inner_subs.len())
+                                    //println!("sub count: {}", inner_subs.len())
                                 }
                                 if inner_subs.len() > 0 {
                                     let img =
@@ -727,18 +643,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
                                             inner_hwnd, inner_crop).unwrap();
 
                                     for i in 0..inner_subs.len() {
-                                        println!("{}", inner_hwnd);
                                         if inner_hwnd != 0 {
                                             let req =
                                                 inner_subs[i].try_send(BinaryMessage(img.clone()));
-                                            match req {
-                                                Ok(_) => {
-                                                    println!("img: OK");
-                                                }
-                                                Err(_) => {
-                                                    println!("img: ERR");
-                                                }
-                                            }
+                                            
                                         }
                                     }
                                 }
@@ -770,51 +678,8 @@ async fn ws_index(req: HttpRequest, stream: web::Payload, data: web::Data<AppSta
         img_crop: Arc::clone(&data.img_sub_status.display_crop),
     }, &req, stream);
 
-    println!("{:?}", resp);
     resp
 }
-
-// #[get("/jpeg_test")]
-// async fn jpeg_test(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
-//     println!("start");
-//     let mut now = Instant::now();
-//     let mut strres = "".to_string();
-//     for i in 0..10 {
-//         let buf = capture_display().unwrap();
-//         let img = RgbaImage::from_raw(buf.width, buf.height, buf.pixels).unwrap();
-//         let mut buffer = BufWriter::new(Cursor::new(Vec::new()));
-//         img.write_to(&mut buffer, ImageFormat::Jpeg).unwrap();
-//         let bytes: Vec<u8> = buffer.into_inner().unwrap().into_inner();
-//     };
-//
-//     println!("end");
-//     println!("Elapsed first: {:.2?}", now.elapsed());
-//     strres += &*format!("Elapsed first: {:.2?}", now.elapsed()).to_string();
-//
-//     now = Instant::now();
-//
-//     use std::io::BufWriter;
-//     for i in 0..10 {
-//         let buf = capture_display().unwrap();
-//
-//         let ref mut w = BufWriter::new(Cursor::new(Vec::new()));
-//         let mut outputasd = Vec::new();
-//         {
-//             let mut encoder = png::Encoder::new(&mut outputasd, buf.width, buf.height);
-//             encoder.set_color(png::ColorType::Rgba);
-//             encoder.set_depth(png::BitDepth::Eight);
-//             let mut writer = encoder.write_header().unwrap();
-//
-//             writer.write_image_data(&buf.pixels).unwrap(); // Save
-//         }
-//     };
-//     println!("end");
-//     println!("Elapsed second: {:.2?}", now.elapsed());
-//     strres += &*format!("   Elapsed second: {:.2?}", now.elapsed()).to_string();
-//
-//     HttpResponse::Ok()
-//         .body(strres)
-// }
 
 #[actix_web::main]
 pub async fn main() -> std::io::Result<()> {
@@ -825,14 +690,9 @@ pub async fn main() -> std::io::Result<()> {
     let addon_config = AddonConfig::load().await;
     let state = web::Data::new(AppState {
         last_bytes: Mutex::from(Vec::new()),
-        last_update: Mutex::from(Instant::now()),
         main_html_string: include_str!("../../frontend/build/index.html"),
-        mcdu_svg: "",
-        ecam_svg: include_str!("../../ecam_controls.svg"),
-        tiff_js: include_str!("../tiff.min.js"),
-        icon_png: include_bytes!("../../icon_compressed.png"),
+        icon_png: include_bytes!("../../svg/reachfms_white.png"),
         instrument_list: Mutex::from(vec![]),
-        list_of_allowed_hwnd: Mutex::new(Vec::new()),
         config: Arc::new(Mutex::from(config)),
         child_process: Mutex::from(Option::None),
         //selected_hwnd: Mutex::from(0),
@@ -853,10 +713,9 @@ pub async fn main() -> std::io::Result<()> {
             display_crop: Arc::new(Mutex::new([[0, 0], [0, 0]])),
         },
         addon_config,
-
     });
     let static_path: String = get_static_folder();
-
+    
 
     HttpServer::new(move || {
         let cors = Cors::permissive();
@@ -864,11 +723,8 @@ pub async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .app_data(state.clone())
             .service(index)
-            .service(ecam_svg)
-            .service(tiffjs)
             .service(icon_png)
             .service(mcdu_btn)
-            .service(get_image)
             .service(save_debug)
             .service(set_hwnd_settings)
             .service(get_windows)
@@ -883,9 +739,6 @@ pub async fn main() -> std::io::Result<()> {
             .service(stop_server)
             .service(set_hwnd)
             .service(bridge_reconnect)
-            .service(force_rescan)
-            .service(calibrate_displays)
-            .service(test_ws)
             .service(bridge_status)
             .service(get_aircraft)
             .service(Files::new("/static", static_path.clone()))

@@ -154,6 +154,15 @@ namespace SimConnector
             } else if (text == "STATUS")
             {
                 this.SendMessageAsync("STATUS:"+wasm.WasmConnected.ToString().ToUpper());
+            } else if (text == "RECONNECT")
+            {
+                if (!wasm.WasmConnected){
+                    wasm.Connect();
+                    this.SendMessageAsync("RECONNECT:OK");
+                }else
+                {
+                    this.SendMessageAsync("RECONNECT:CONNECTED");
+                }
             }
             else if (text.Contains("CMD_BTN"))
             {

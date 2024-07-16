@@ -6,6 +6,8 @@ mod http_streamer;
 mod config_handler;
 mod comm_sender;
 mod addon_config;
+mod mobiflight_installer;
+mod debug_logger;
 
 use std::{thread, time};
 use std::os::windows::process::CommandExt;
@@ -13,15 +15,12 @@ use std::process::{Command};
 use fltk::{enums::{Color, Font, FrameType, Cursor}, prelude::*, *};
 use fltk::app::{screen_size};
 use fltk::enums::{Event};
-use crate::addon_config::AddonConfig;
 use crate::config_handler::ConfigHandler;
 use crate::image_process::ImageProcess;
 
 
 // TODO:
-// add window excluding
-// add multiple localhost option display
-// restore windows on app exit or server stop
+// logging to file
 
 #[derive(Copy, Clone)]
 enum Message {
@@ -30,6 +29,8 @@ enum Message {
     Continue,
     ShowAllUrl,
     CloseAllUrl,
+    AutomaticInstall,
+    ManualInstall,
 }
 
 struct McduApp {
@@ -46,6 +47,12 @@ struct McduApp {
     url_not_working: button::Button,
     all_ip_pack: group::Pack,
     adress_list: frame::Frame,
+    install_manually: button::Button,
+    install_automatically: button::Button,
+    continue_button: button::Button,
+    instructions: frame::Frame,
+    mobi_text: frame::Frame,
+    first_welcome_text: frame::Frame,
 }
 
 impl McduApp {
@@ -55,15 +62,12 @@ impl McduApp {
         let monitor_size = screen_size();
         let center_pos: (i32, i32) = (monitor_size.0 as i32 / 2 - 300, monitor_size.1 as i32 / 2 - 300);
         let mut main_win = window::Window::new(center_pos.0, center_pos.1,
-                                               600, 400, "A320 Remote MCDU");
+                                               600, 400, "ReachFMS");
         main_win.set_color(Color::from_rgb(21, 26, 32));
         let mut start_button = button::Button::new(0, 350, 160, 40, "Start server").center_x(&main_win);
 
         let qr_frame = frame::Frame::new(0, 150, 200, 200, "").center_x(&main_win);
 
-        let mut welcome_text = frame::Frame::new(0, 14, 60, 40, "")
-            .center_x(&main_win)
-            .with_label("Remote MCDU for\nthe Fenix A320");
         let mut status_text = frame::Frame::new(0, 60, 140, 20, "")
             .center_x(&main_win)
             .with_label("Status: stopped");
@@ -97,9 +101,9 @@ impl McduApp {
         all_ip_pack.end();
 
 
-        let mut logo_frame = frame::Frame::new(175, 25, 30, 30, "");
-        let mut logo_image = image::PngImage::from_data(include_bytes!("../../transparent-compressed.png")).unwrap();
-        logo_image.scale(50, 50, true, true);
+        let mut logo_frame = frame::Frame::new(175, 25, 30, 30, "").center_x(&main_win);
+        let logo_image = image::PngImage::from_data(include_bytes!("../../svg/reachfms_white220.png")).unwrap();
+        //logo_image.scale(50, 50, true, true);
         logo_frame.set_image(Some(logo_image));
 
         main_win.end();
@@ -107,6 +111,7 @@ impl McduApp {
 
         main_win.set_callback(|_| {
             if fltk::app::event() == fltk::enums::Event::Close {
+                ImageProcess::restore_all();
                 match reqwest::blocking::get("http://localhost:5273/stop_server") {
                     Ok(..) => {
                         println!("server closed, closing the app...");
@@ -211,9 +216,6 @@ impl McduApp {
         url_not_working.set_frame(FrameType::NoBox);
         url_not_working.hide();
 
-        welcome_text.set_label_size(18);
-        welcome_text.set_label_color(Color::White);
-        welcome_text.set_label_font(Font::Helvetica);
         //welcome_text.set_align(Align::Right);
 
         //all_ip_pack.set_color(Color::from_rgb(128, 128, 128));
@@ -244,25 +246,91 @@ impl McduApp {
         //start_button.emit(s, Message::Start);
 
         let icon_image = image::PngImage::from_data(include_bytes!("../../transparent-compressed.png")).unwrap();
-        main_win.set_icon(Some(icon_image));
-
-
-        let mut first_window = window::Window::new(center_pos.0, center_pos.1, 600, 400, "A320 Remote MCDU First start");
+        main_win.set_icon(Some(icon_image.clone()));
+        
+        
+        let mut first_window = window::Window::new(center_pos.0, center_pos.1, 600, 400, "ReachFMS First start");
+        first_window.set_icon(Some(icon_image));
         first_window.set_color(Color::from_rgb(21, 26, 32));
-        let mut continue_button = button::Button::new(0, 350, 160, 40, "Continue").center_x(&first_window);
-        let mut first_welcome_text = frame::Frame::new(0, 30, 100, 40, "")
+        let mut continue_button = button::Button::new(0, 270, 160, 40, "Continue").center_x(&first_window);
+        let mut install_automatically = button::Button::new(120, 200, 160, 40, "Install automatically");
+        let mut install_manually = button::Button::new(320, 200, 160, 40, "Install manually");
+        let mut mobi_text = frame::Frame::new(0, 60, 400, 150, "")
             .center_x(&first_window)
-            .with_label("Welcome to the Remote A320 MCDU app!");
-        let mut instructions = frame::Frame::new(0, 100, 600, 100, "")
-            .with_label("1. Make sure that you have at least the SU12 update.\n\n2. You should now install the wasm module\nto your Community directory:\nThe wasm module can be found in the downloaded .rar file.\nMove the remotemcdu-wasm folder to your Community folder.");
+            .with_label("Welcome to the ReachFMS app!");
+        mobi_text.hide();
 
-        first_window.end();
+        let mut first_welcome_text = frame::Frame::new(0, 50, 100, 40, "")
+            .center_x(&first_window)
+            .with_label("Welcome to the ReachFMS app!");
+        let mut instructions = frame::Frame::new(0, 100, 600, 100, "")
+            .with_label("1. Make sure that you have at least the SU12 update.\n\n2. The mobiflight wasm module is need to be installed for the app to run.\nIn the next step this will be checked, and you can choose\nif you want it to be installed automatically");
+
+        let mut reachfms_logo = frame::Frame::new(0, 10, 220, 39, "").center_x(&first_window);
+        let mut reachfms_image = image::PngImage::from_data(include_bytes!("../../svg/reachfms_white220.png")).unwrap();
+        //reachfms_image.scale(220, 39, true, true);
+        reachfms_logo.set_image(Some(reachfms_image));
+        
         if !ConfigHandler::is_data_created() {
+
+            // first window starts here
+            install_automatically.handle(move |b, event| match event {
+                Event::Enter => {
+                    b.set_color(Color::from_rgb(96, 130, 182));
+                    b.redraw();
+                    true
+                }
+                Event::Leave => {
+                    b.set_color(Color::from_rgb(47, 53, 67));
+                    b.redraw();
+                    true
+                }
+                Event::Push => {
+                    b.emit(s, Message::AutomaticInstall);
+                    true
+                }
+                _ => false,
+            });
+
+            install_manually.handle(move |b, event| match event {
+                Event::Enter => {
+                    b.set_color(Color::from_rgb(96, 130, 182));
+                    b.redraw();
+                    true
+                }
+                Event::Leave => {
+                    b.set_color(Color::from_rgb(47, 53, 67));
+                    b.redraw();
+                    true
+                }
+                Event::Push => {
+                    b.emit(s, Message::ManualInstall);
+                    true
+                }
+                _ => false,
+            });
+
+            install_automatically.hide();
+            install_manually.hide();
+
+
+
+            first_window.end();
             main_win.hide();
             first_window.show();
+            install_automatically.set_color(Color::from_rgb(47, 53, 67));
+            install_automatically.set_label_color(Color::Green);
+            install_automatically.set_frame(FrameType::FlatBox);
+
+
+            install_manually.set_color(Color::from_rgb(47, 53, 67));
+            install_manually.set_label_color(Color::Green);
+            install_manually.set_frame(FrameType::FlatBox);
+
             continue_button.set_color(Color::from_rgb(47, 53, 67));
             continue_button.set_label_color(Color::Green);
             continue_button.set_frame(FrameType::FlatBox);
+
             continue_button.handle(move |b, event| match event {
                 Event::Enter => {
                     b.set_color(Color::from_rgb(96, 130, 182));
@@ -287,16 +355,25 @@ impl McduApp {
             instructions.set_label_size(15);
             instructions.set_label_color(Color::White);
             instructions.set_label_font(Font::Helvetica);
-        }else {
+
+            mobi_text.set_label_size(17);
+            mobi_text.set_label_color(Color::White);
+            mobi_text.set_label_font(Font::HelveticaBold);
+
+
+            if mobiflight_installer::mobiflight_installed() {
+                mobi_text.set_label("It seems like that you have the mobiflight wasm module installed. \n The mobiflight wasm module is needed for the app to function properly. \n If you installed the module a a while ago consider updating it.")
+            } else {
+                mobi_text.set_label("It seems like that you don't have mobiflight installed.\n The mobiflight wasm module is needed for the app to function properly.\n You can install the event_module manuall, or the app can do it automatically.")
+            }
+        } else {
             let mut config = ConfigHandler::init();
             config.read_config();
-            if config.auto_start{
+            if config.auto_start {
                 drop(config);
                 s.send(Message::Start);
             }
         }
-
-
 
 
         Self {
@@ -313,6 +390,12 @@ impl McduApp {
             url_not_working,
             all_ip_pack,
             adress_list,
+            install_automatically,
+            install_manually,
+            continue_button,
+            instructions,
+            mobi_text,
+            first_welcome_text,
         }
     }
 
@@ -329,6 +412,7 @@ impl McduApp {
                     Message::Start => {
                         self.main_win.set_cursor(Cursor::Wait);
                         if self.bridge_started {
+                            ImageProcess::restore_all();
                             let resp = reqwest::blocking::get("http://localhost:5273/stop_server");
                             match &resp {
                                 Ok(..) => {
@@ -393,8 +477,28 @@ impl McduApp {
                         }
                     }
                     Message::Continue => {
-                        self.first_window.hide();
-                        self.main_win.show();
+                        if !self.mobi_text.visible() && self.instructions.visible() {
+                            if !mobiflight_installer::mobiflight_installed() {
+                                self.continue_button.hide();
+                                self.install_automatically.show();
+                                self.install_manually.show();
+                            }
+                            self.instructions.hide();
+                            self.mobi_text.show();
+                            self.first_welcome_text.set_label("ReachFMS Setup");
+                        } else if self.continue_button.label().contains("Check") {
+                            if !mobiflight_installer::mobiflight_installed() {
+                                self.mobi_text.set_label("It seems like the wasm module is still not installed. \n\n Please try again!");
+                                self.mobi_text.redraw_label();
+                                self.mobi_text.redraw()
+                            } else {
+                                self.first_window.hide();
+                                self.main_win.show();
+                            }
+                        }else {
+                            self.first_window.hide();
+                            self.main_win.show();
+                        }
                     }
                     Message::ShowAllUrl => {
                         let mut addr_str: String = "".to_string();
@@ -413,6 +517,36 @@ impl McduApp {
                         self.all_ip_pack.hide();
                         self.qr_frame.show();
                     }
+                    Message::AutomaticInstall => {
+                        self.install_automatically.hide();
+                        self.install_manually.hide();
+                        self.install_automatically.hide();
+                        self.install_manually.hide();
+                        self.mobi_text.set_label("The mobiflight wasm module is now installing automatically. \n\n Please wait!");
+                        self.mobi_text.redraw_label();
+                        self.mobi_text.redraw();
+                        
+                        mobiflight_installer::install_mobiflight();
+
+                        self.first_window.hide();
+                        self.main_win.show();
+                    }
+                    Message::ManualInstall => {
+                        self.install_automatically.hide();
+                        self.install_manually.hide();
+                        
+                        self.continue_button.set_label("Check installation");
+                        self.mobi_text.set_label("Now install the wasm module to your community folder.\n Once it is installed, click the Check button to continue.");
+                        self.continue_button.show();
+                        
+                        if let Ok(mut child) = Command::new("cmd.exe").creation_flags(0x00000008u32)
+                            .arg("/C").arg("start").arg("").arg("https://github.com/MobiFlight/MobiFlight-WASM-Module/releases/latest/").spawn() {
+                            thread::sleep(time::Duration::new(3, 0)); // On windows need to allow time for browser to start
+                            if let Ok(..) = child.wait() {
+                                println!("ok")
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -420,10 +554,8 @@ impl McduApp {
 }
 
 fn main() {
-    // let hostfxr = nethost::load_hostfxr().unwrap();
-    // let context = hostfxr.initialize_for_dotnet_command_line(pdcstr!("Test.dll")).unwrap();
-    // let result = context.run_app().value();
-    
+    //mobiflight_installer::download_package();
+
     let a = McduApp::new();
     a.run();
 }
