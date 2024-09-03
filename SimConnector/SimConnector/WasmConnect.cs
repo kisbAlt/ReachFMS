@@ -1,11 +1,18 @@
 ﻿using System.Runtime.InteropServices;
-using System.Xml.Serialization;
+using System.Text.RegularExpressions;
 using Microsoft.FlightSimulator.SimConnect;
 using SimConnector.MobiFlight.SimConnectMSFS;
 
 
 namespace SimConnector
 {
+    public enum FSUIPCOffsetType
+    {
+        Integer,
+        // UnsignedInt, // still not supported
+        Float,
+        String
+    }
     public enum DATA_REQUESTS
     {
         AIRCRAFT_LOADED
@@ -44,7 +51,7 @@ namespace SimConnector
 
         public void MessageLoop()
         {
-            Console.WriteLine("MessageLoop started...");
+            SimLogger.Log("MessageLoop started...");
             bool asked = false;
             int count = 0;
             while (true && ParentWatcher.ParentRunning())
@@ -105,6 +112,13 @@ namespace SimConnector
         private List<String> LVars = new List<String>();
         private String ResponseStatus = "NEW";
 
+        public string GetSimVarsJson()
+        {
+            String resp = Newtonsoft.Json.JsonConvert.SerializeObject(SimVars);
+            resp += Newtonsoft.Json.JsonConvert.SerializeObject(StringSimVars);
+            resp += Newtonsoft.Json.JsonConvert.SerializeObject(LVars);
+            return resp;
+        }
 
 
         private static SimConnect simconnect = null;
@@ -132,7 +146,7 @@ namespace SimConnector
         public string AircraftFile = "";
         public void Init()
         {
-            Console.WriteLine("Starting...");
+            SimLogger.Log("Starting...");
             WasmInitClientData = new WasmModuleClientData()
             {
                 NAME = "MobiFlight",
@@ -232,7 +246,7 @@ namespace SimConnector
                     m_oSimConnect.OnRecvException += new SimConnect.RecvExceptionEventHandler(SimConnect_OnRecvException);
                     // Listen to exceptions
                     //Log.Instance.log("SimConnect (MSFS2020) instantiated", LogSeverity.Debug);
-                    Console.WriteLine("Connecting...");
+                    SimLogger.Log("Connecting...");
                     
                 }
             }
@@ -247,17 +261,16 @@ namespace SimConnector
 
         private void SimConnect_RecvSimobjectData(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA data)
         {
-            Console.WriteLine("RecvSimObData");
             var title = (StringData)data.dwData[0];
             AircraftTitle = title.sValue;
             AircraftChanged?.Invoke(this, title.sValue);
             m_oSimConnect.RequestSystemState(DATA_REQUESTS.AIRCRAFT_LOADED, "AircraftLoaded");
-            Console.WriteLine("SystemState requested");
+            SimLogger.Log("SystemState requested");
         }
 
         private void SimConnect_OnRecvOpen(SimConnect sender, SIMCONNECT_RECV_OPEN data)
         {
-            Console.WriteLine("RecvOpen");
+            SimLogger.Log("RecvOpen");
             _simConnectConnected = true;
             // register Events
             //foreach (string GroupKey in Events.Keys)
@@ -325,7 +338,6 @@ namespace SimConnector
 
         private void SimConnectCache_OnRecvClientData(SimConnect sender, SIMCONNECT_RECV_CLIENT_DATA data)
         {
-            Console.WriteLine("RecvCleintData");
             try
             {
                 // Init Client Callback
@@ -335,7 +347,7 @@ namespace SimConnector
 
                     if (simData.Data == "MF.Pong")
                     {
-                        Console.WriteLine("Pong");
+                        SimLogger.Log("Pong");
                         if (!_wasmConnected)
                         {
                             // Next add runtime client                    
@@ -369,7 +381,6 @@ namespace SimConnector
                     else if (ResponseStatus == "LVars.List.Receiving")
                     {
                         LVars.Add(simData.Data);
-                        Console.WriteLine(simData.Data);
                     }
 
 
@@ -408,7 +419,7 @@ namespace SimConnector
         // The case where the user closes game
         private void SimConnect_OnRecvQuit(SimConnect sender, SIMCONNECT_RECV data)
         {
-            Console.WriteLine("RecvQuit");
+            SimLogger.Log("RecvQuit");
             ConnectionLost?.Invoke(this, null);
             Disconnect();
         }
@@ -418,11 +429,11 @@ namespace SimConnector
             SIMCONNECT_EXCEPTION eException = (SIMCONNECT_EXCEPTION)data.dwException;
             if (eException == SIMCONNECT_EXCEPTION.ALREADY_CREATED)
             {
-                Console.WriteLine(eException.ToString());
+                SimLogger.Log(eException.ToString());
                 //Log.Instance.log(eException.ToString(), LogSeverity.Debug);
             }
             else
-                Console.WriteLine(eException.ToString());
+                SimLogger.Log(eException.ToString());
             //Log.Instance.log(eException.ToString(), LogSeverity.Error);
         }
 
@@ -497,51 +508,6 @@ namespace SimConnector
             //Log.Instance.log("SimVars Cleared.", LogSeverity.Debug);
         }
 
-        public void setOffset(int offset, byte value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void setOffset(int offset, short value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void setOffset(int offset, int value, bool writeOnly = false)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void setOffset(int offset, float value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void setOffset(int offset, double value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void setOffset(int offset, string value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void executeMacro(string macroName, int parameter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Write()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void setEventID(int eventID, int param)
-        {
-            throw new NotImplementedException();
-        }
-
 
         public bool ButtonPressL(string lvar)
         {
@@ -576,13 +542,135 @@ namespace SimConnector
                 case (int)DATA_REQUESTS.AIRCRAFT_LOADED:
                     if (!string.IsNullOrEmpty(data.szString))
                     {
-                        Console.WriteLine($"Received aircraft  {data.szString}");
+                        SimLogger.Log($"Received aircraft  {data.szString}");
 
                         this.AircraftFile = data.szString;
 
                     }
                     break;
             }
+        }
+
+        public FSUIPCOffsetType GetSimVar(String simVarName, out String stringVal, out double floatVal)
+        {
+            FSUIPCOffsetType simVarType = FSUIPCOffsetType.Float;
+            bool isFloat = false;
+            bool isString = false;
+
+            stringVal = "0";
+            floatVal = 0.0F;
+
+            if (!IsConnected())
+                return simVarType;
+
+            if (simVarName == null)
+                return simVarType;
+
+            isFloat = SimVars.Exists(lvar => lvar.Name == simVarName);
+            if (!isFloat)
+            {
+                isString = StringSimVars.Exists(lvar => lvar.Name == simVarName);
+
+                if (!isString)
+                {
+                    simVarType = RegisterSimVar(simVarName);
+                    if (simVarType == FSUIPCOffsetType.String)
+                    {
+                        WasmModuleClient.AddStringSimVar(m_oSimConnect, simVarName, WasmRuntimeClientData);
+                    }
+                    else
+                    {
+                        WasmModuleClient.AddSimVar(m_oSimConnect, simVarName, WasmRuntimeClientData);
+                    }
+                }
+                else
+                {
+                    simVarType = FSUIPCOffsetType.String;
+                }
+            }
+
+            if (simVarType == FSUIPCOffsetType.Float)
+            {
+                floatVal = SimVars.Find(lvar => lvar.Name == simVarName).Data;
+            }
+            else
+            {
+                stringVal = StringSimVars.Find(lvar => lvar.Name == simVarName).Data;
+                stringVal = (stringVal) == null ? "0" : stringVal;
+            }
+
+            return simVarType;
+        }
+
+        private FSUIPCOffsetType RegisterSimVar(string SimVarName)
+        {
+            // Matches presets like "(A:TITLE,String)" in different variations. These will most likely be of type String an will therefore be treated as String.
+            Match stringPreset = Regex.Match(SimVarName, "\\(.*A.*:.*,.*String.*\\)", RegexOptions.IgnoreCase);
+            FSUIPCOffsetType simVarType = stringPreset.Success ? FSUIPCOffsetType.String : FSUIPCOffsetType.Float;
+
+            if (simVarType == FSUIPCOffsetType.Float)
+            {
+                // Register SimVar as float
+                SimVar newSimVar = new SimVar() { Name = SimVarName, ID = (uint)(SimVars.Count + SIMVAR_DATA_DEFINITION_OFFSET) };
+                SimVars.Add(newSimVar);
+                if (MaxClientDataDefinition < (SimVars.Count + SIMVAR_DATA_DEFINITION_OFFSET - 1 + StringSimVars.Count))
+                {
+                    // Register SimVar as float
+                    m_oSimConnect?.AddToClientDataDefinition(
+                        (SIMCONNECT_DEFINE_ID)newSimVar.ID,
+                        (uint)((newSimVar.ID - SIMVAR_DATA_DEFINITION_OFFSET) * sizeof(float)),
+                        sizeof(float),
+                        0,
+                        0);
+
+                    m_oSimConnect?.RegisterStruct<SIMCONNECT_RECV_CLIENT_DATA, ClientDataValue>((SIMCONNECT_DEFINE_ID)newSimVar.ID);
+
+                    m_oSimConnect?.RequestClientData(
+                        WasmRuntimeClientData.AREA_SIMVAR_ID,
+                        (SIMCONNECT_REQUEST_ID)newSimVar.ID,
+                        (SIMCONNECT_DEFINE_ID)newSimVar.ID,
+                        SIMCONNECT_CLIENT_DATA_PERIOD.ON_SET,
+                        SIMCONNECT_CLIENT_DATA_REQUEST_FLAG.CHANGED,
+                        0,
+                        0,
+                        0
+                    );
+
+                    MaxClientDataDefinition = (uint)(SimVars.Count + SIMVAR_DATA_DEFINITION_OFFSET - 1 + StringSimVars.Count);
+                }
+            }
+            else
+            {
+                // Register SimVar as string (different ID-offset, size and a separate data-area)
+                StringSimVar newStringSimVar = new StringSimVar() { Name = SimVarName, ID = (uint)StringSimVars.Count + 1 + MOBIFLIGHT_STRINGVAR_ID_OFFSET };
+                StringSimVars.Add(newStringSimVar);
+                if (MaxClientDataDefinition < (SimVars.Count + SIMVAR_DATA_DEFINITION_OFFSET - 1 + StringSimVars.Count))
+                {
+                    m_oSimConnect?.AddToClientDataDefinition(
+                        (SIMCONNECT_DEFINE_ID)(newStringSimVar.ID),
+                        (uint)((StringSimVars.Count - 1) * MOBIFLIGHT_STRINGVAR_SIZE),
+                        MOBIFLIGHT_STRINGVAR_SIZE,
+                        0,
+                        0);
+
+                    m_oSimConnect?.RegisterStruct<SIMCONNECT_RECV_CLIENT_DATA, ClientDataStringValue>((SIMCONNECT_DEFINE_ID)newStringSimVar.ID);
+
+                    m_oSimConnect?.RequestClientData(
+                        WasmRuntimeClientData.AREA_STRINGSIMVAR_ID,
+                        (SIMCONNECT_REQUEST_ID)(newStringSimVar.ID),
+                        (SIMCONNECT_DEFINE_ID)(newStringSimVar.ID),
+                        SIMCONNECT_CLIENT_DATA_PERIOD.ON_SET,
+                        SIMCONNECT_CLIENT_DATA_REQUEST_FLAG.CHANGED,
+                        0,
+                        0,
+                        0
+                    );
+
+                    MaxClientDataDefinition = (uint)(SimVars.Count + SIMVAR_DATA_DEFINITION_OFFSET - 1 + StringSimVars.Count);
+                }
+            }
+
+            return simVarType;
         }
     }
 }

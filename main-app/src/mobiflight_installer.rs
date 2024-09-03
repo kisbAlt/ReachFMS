@@ -3,16 +3,9 @@ use std::fs::File;
 use std::io::{Write};
 use std::path::PathBuf;
 use crate::config_handler;
+use crate::debug_logger::show_fatal_error;
 
 // check if mobiflight wasm module is installed, if not install it.
-pub fn check_mobiflight() {
-    let community: String = get_community_folder().unwrap();
-
-    if !mobiflight_installed() {
-        install_mobiflight();
-    }
-}
-
 
 pub fn get_community_folder() -> Result<String, bool> {
     #[cfg(windows)]
@@ -23,10 +16,11 @@ pub fn get_community_folder() -> Result<String, bool> {
         file_path = std::env::var("LOCALAPPDATA").expect("No APP_DATA1 directory")
             + "\\Packages\\Microsoft.FlightSimulator_8wekyb3d8bbwe\\LocalCache\\UserCfg.opt";
         if !std::path::Path::new(&file_path).exists() {
+            show_fatal_error("Can't find your community folder!");
             return Err(false);
         }
     }
-    println!("1:{}", &file_path);
+    
     let content = fs::read_to_string(&file_path)
         .expect("Cant read config file");
 
@@ -34,10 +28,10 @@ pub fn get_community_folder() -> Result<String, bool> {
         if line.contains("InstalledPackagesPath") {
             let community_path = line.split("\"").collect::<Vec<&str>>()[1].to_string()
                 + "\\Community";
-            println!("{}", community_path);
             return Ok(community_path);
         }
     }
+    show_fatal_error("Can't find your community folder!");
     return Err(false);
 }
 
@@ -81,7 +75,6 @@ pub fn download_package() {
             extract_mobi(&filename);
         }
         Err(..) => {
-            println!("Not avialable");
         }
     }
 }
@@ -106,20 +99,12 @@ fn extract_mobi(zip_file: &String) {
         {
             let comment = file.comment();
             if !comment.is_empty() {
-                println!("File {i} comment: {comment}");
             }
         }
 
         if file.is_dir() {
-            println!("File {} extracted to \"{}\"", i, outpath.display());
             fs::create_dir_all(&outpath).unwrap();
         } else {
-            println!(
-                "File {} extracted to \"{}\" ({} bytes)",
-                i,
-                outpath.display(),
-                file.size()
-            );
             if let Some(p) = outpath.parent() {
                 if !p.exists() {
                     fs::create_dir_all(p).unwrap();

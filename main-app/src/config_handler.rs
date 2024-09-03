@@ -1,7 +1,9 @@
 use std::{fs};
 use std::fs::File;
+use std::sync::{Arc, Mutex};
 use qrcode_generator::QrCodeEcc;
 use serde::{Deserialize, Serialize};
+use crate::debug_logger;
 
 #[derive(Serialize, Deserialize)]
 #[derive(Clone)]
@@ -14,6 +16,9 @@ pub struct ConfigHandler {
     pub multiple_displays: bool,
     pub auto_start: bool,
     pub calibrated: bool,
+    pub log_enabled: bool,
+    #[serde(skip_serializing, skip_deserializing)]
+    log_str: Option<Arc<Mutex<String>>>
 }
 
 #[derive(Serialize, Deserialize)]
@@ -25,7 +30,7 @@ pub struct DebugSave {
 }
 
 impl ConfigHandler {
-    pub fn init() -> Self {
+    pub fn init(log_str: Option<Arc<Mutex<String>>>) -> Self {
         let host = ConfigHandler::get_localhost();
         let local_ip = host.clone();
         let default_config = ConfigHandler {
@@ -37,14 +42,18 @@ impl ConfigHandler {
             multiple_displays: true,
             auto_start: false,
             calibrated: false,
+            log_str,
+            log_enabled: false
         };
 
         if !ConfigHandler::is_data_created() {
+            debug_logger::log("creating data folder...", &default_config.log_str);
             fs::create_dir(&get_file_in_exe_folder(vec!["data"])).unwrap();
 
         }
 
         if !ConfigHandler::is_config_created() {
+            debug_logger::log("creating config.json...", &default_config.log_str);
             File::create(get_config_file())
                 .expect("Error encountered while creating file!");
             let json_string = serde_json::to_string(&default_config).unwrap();
@@ -64,6 +73,7 @@ impl ConfigHandler {
         self.multiple_displays = deserialized.multiple_displays;
         self.cpu_displays = deserialized.cpu_displays;
         self.calibrated = deserialized.calibrated;
+        self.log_enabled = deserialized.log_enabled
     }
 
     pub fn get_all_local_ip() -> Vec<String> {
@@ -130,8 +140,9 @@ pub fn get_addon_config() -> String {
     return get_file_in_exe_folder(vec!["static", "addon_config.json"])
 }
 
+pub const SIMCONNECTOR_RELATIVE_DIR: &str = "SimConnector";
 pub fn get_simconnector_exe() -> String {
-    return get_file_in_exe_folder(vec!["SimConnector.exe"])
+    return get_file_in_exe_folder(vec![SIMCONNECTOR_RELATIVE_DIR, "SimConnector.exe"])
 }
 
 pub fn get_config_file() -> String {
@@ -139,4 +150,7 @@ pub fn get_config_file() -> String {
 }
 pub fn get_qr_file() -> String {
     return get_file_in_exe_folder(vec!["data", "qr.png"])
+}
+pub fn get_log_file() -> String {
+    return get_file_in_exe_folder(vec!["reachfms.log"])
 }

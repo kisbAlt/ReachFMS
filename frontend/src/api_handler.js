@@ -79,3 +79,13 @@ export async function setFMS(hwnd) {
     return (await fetch(process.env.REACT_APP_LOCALHOST_PREFIX +
         `/set_hwnd?hwnd=${hwnd}`)).text()
 }
+
+export async function sendTouchEvent(xPos, yPos) {
+    return (await fetch(process.env.REACT_APP_LOCALHOST_PREFIX +
+        `/touch_event?x_pos=${xPos}&y_pos=${yPos}`)).text()
+}
+
+export async function btnEvent(btn_name) {
+    return (await fetch(process.env.REACT_APP_LOCALHOST_PREFIX +
+        `/mcdu_btn_press?btn=${btn_name}`)).text()
+}

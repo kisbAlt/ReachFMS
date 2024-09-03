@@ -1,5 +1,6 @@
 import {useState, useEffect} from 'react';
 import {
+    getAddonConfig,
     getStatus,
     hideWindows,
     instrAutoHide, instrExclude,
@@ -12,14 +13,14 @@ import {Tick} from "./tick";
 import {getAircraftConfig} from "../config_handler";
 
 
-export  function _arrayBufferToBase64( buffer ) {
+export function _arrayBufferToBase64(buffer) {
     var binary = '';
-    var bytes = new Uint8Array( buffer );
+    var bytes = new Uint8Array(buffer);
     var len = bytes.byteLength;
     for (var i = 0; i < len; i++) {
-        binary += String.fromCharCode( bytes[ i ] );
+        binary += String.fromCharCode(bytes[i]);
     }
-    return window.btoa( binary );
+    return window.btoa(binary);
 }
 
 
@@ -32,6 +33,9 @@ export function SettignsComponent(props) {
     const [loadedAircraft, setLoadedAircraft] = useState("")
     const [instrumentSettings, setInstrumentSettings] = useState([])
     const [autoStartServer, setAutoStartServer] = useState(false)
+    const [showConfigs, setShowConfigs] = useState(false)
+    const [allConfigs, setAllConfigs] = useState([])
+    const [versions, setVersions] = useState({"version": 0, "date": ""})
 
 
     function checkerHandler() {
@@ -57,9 +61,16 @@ export function SettignsComponent(props) {
             setMultipleChecked(true)
         }
     }
+
     async function reconnect() {
         await reconnectBridge();
         await loadSave();
+    }
+
+    async function loadAllAddons() {
+        setShowConfigs(true)
+        let addons_ls = await getAddonConfig();
+        setAllConfigs(addons_ls.aircraft_addons)
     }
 
     async function sendSave() {
@@ -84,14 +95,13 @@ export function SettignsComponent(props) {
         }
         props.setRefresh(refresh_rate)
         props.setTiff(!maxChecked)
-        await sendSettings(refresh_rate, autoChecked, maxChecked, multipleChecked, alternateChecked, autoStartServer    )
+        await sendSettings(refresh_rate, autoChecked, maxChecked, multipleChecked, alternateChecked, autoStartServer)
         props.showNotification("Settings saved.")
         props.refreshFunction()
     }
 
     async function loadSave() {
         var status = await getStatus();
-        console.log(status)
         var settings = status.settings;
         var refresh_setting = "normal"
 
@@ -123,59 +133,23 @@ export function SettignsComponent(props) {
 
         setBridgeConnected(status.bridge_status.connected)
 
-        let aircraft_config = await getAircraftConfig();
-        if(aircraft_config != null) {
-            setLoadedAircraft(aircraft_config.display)
-        }
-
-    }
-
-    function getBaseImageString(buffer) {
-        // var u8 = new Uint8Array(uarray);
-        // var b64encoded = btoa(String.fromCharCode.apply(null, u8));
-        // return b64encoded
-        if(buffer.length > 10000){
-            return ""
-        }
-        var binary = '';
-        var bytes = new Uint8Array( buffer );
-        var len = bytes.byteLength;
-        for (var i = 0; i < len; i++) {
-            binary += String.fromCharCode( bytes[ i ] );
-        }
-        return window.btoa( binary );
-    }
-
-    function autoHideInstrument(hwnd) {
-        var temp_list = JSON.parse(JSON.stringify(instrumentSettings));
-        for (let i = 0; i < temp_list.length; i++) {
-            if (temp_list[i].hwnd === hwnd) {
-                if (temp_list[i].auto_hide) {
-                    temp_list[i].auto_hide = false;
-                    instrAutoHide(hwnd, false)
-                } else {
-                    temp_list[i].auto_hide = true;
-                    instrAutoHide(hwnd, true)
+        let aircraft_config = await getAircraftConfig(props.instrumentObjects);
+        if (aircraft_config != null) {
+            setVersions({"version": aircraft_config.version, "date": aircraft_config.updated})
+            if ("display" in aircraft_config) {
+                setLoadedAircraft(aircraft_config.display)
+                if (aircraft_config.touch_enabled) {
+                    if (settings.auto_hide) {
+                        props.showNotification("Pop-out auto hiding is NOT supported with touch instruments. You need to have the " +
+                            "Pop-out window visible on a monitor at all times for this experimental feature to work!", true, 15)
+                    } else {
+                        props.showNotification("It seems like that you are using a touch instrument. This feature is highly " +
+                            "experimental. Make sure that you have the pop-out window visible on a monitor at all times.", false, 10);
+                    }
                 }
             }
         }
-        setInstrumentSettings(temp_list)
-    }
 
-    function excludeInstrument(hwnd) {
-        var temp_list = JSON.parse(JSON.stringify(instrumentSettings));
-        for (let i = 0; i < temp_list.length; i++) {
-            if (temp_list[i].hwnd === hwnd) {
-                if (temp_list[i].excluded) {
-                    temp_list[i].excluded = false;
-                    instrExclude(hwnd, false)
-                } else {
-                    temp_list[i].excluded = true;
-                    instrExclude(hwnd, true)
-                }
-            }
-        }
-        setInstrumentSettings(temp_list)
     }
 
     useEffect(() => {
@@ -187,20 +161,52 @@ export function SettignsComponent(props) {
                 "jpeg_bytes": props.instrumentObjects[i].jpeg_bytes,
                 "instrument": props.instrumentObjects[i].instrument,
                 "hwnd": props.instrumentObjects[i].hwnd,
+                "selected": props.instrumentObjects[i].selected,
             })
         }
         setInstrumentSettings(temp_array)
+        loadSave();
         // eslint-disable-next-line
     }, [props.instrumentObjects]);
 
     useEffect(() => {
-        loadSave();
+
         // eslint-disable-next-line
     }, []);
 
     return (
         <div style={{overflow: "scroll", maxHeight: "100%"}}>
-            <h2>Simulator: <span style={{color: `${bridgeConnected ? ("greenyellow") : ("red")}`}}>
+            {showConfigs && (<div style={{
+                width: "100vw", position: "absolute", opacity: "0.9",
+                height: "100vh", backgroundColor: "black"
+            }}>
+                <div style={{marginLeft: "auto", marginRight: "auto", width: "fit-content", marginTop: "10%"}}>
+                    <table style={{borderColor: "gray"}}>
+                        <thead>
+                        <tr>
+                            <th>Aircraft</th>
+                            <th>Last updated</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {allConfigs.map((item, i) => (
+                            <tr key={i}>
+                                <td>{item.display}</td>
+                                <td>{item.last_updated}</td>
+                            </tr>
+
+
+                        ))}
+                        </tbody>
+                    </table>
+                    <p onClick={() => setShowConfigs(false)}
+                       style={{
+                           padding: "8px", backgroundColor: "darkorange", borderRadius: "5px", marginRight: "auto",
+                           marginLeft: "auto", marginTop: "20px", width: "fit-content", cursor: "pointer"
+                       }}>Close</p>
+                </div>
+            </div>)}
+            <h2>MSFS: <span style={{color: `${bridgeConnected ? ("greenyellow") : ("red")}`}}>
                 {bridgeConnected ? ("Connected") : ("Disconnected")}</span>
                 {bridgeConnected && (<Tick color={"green"}/>)}</h2>
             {bridgeConnected && (
@@ -214,7 +220,7 @@ export function SettignsComponent(props) {
                 marginLeft: "auto",
                 marginRight: "auto"
             }}>
-                {loadedAircraft != "" ?
+                {bridgeConnected ?
                     (
                         <div>
 
@@ -290,8 +296,12 @@ export function SettignsComponent(props) {
                             border: "2px solid royalblue",
                             backgroundColor: "black"
                         }}>
-                            <p>{item.instrument}</p>
-                            <img alt={item.instrument} style={{cursor: "pointer"}} width={"120px"} height={"120px"}
+                            <p style={{fontWeight: "bold", color: "lightskyblue"}}>{item.instrument}</p>
+                            <p style={{height: "20px", color: "goldenrod"}}>{(item.selected && loadedAircraft != "")
+                                ? ("SELECTED") : ("")}</p>
+                            <img alt={item.instrument}
+                                 style={{cursor: (item.selected && loadedAircraft != "") ? ("pointer") : ""}}
+                                 width={"120px"} height={"120px"}
                                  onClick={() => {
                                      if (item.instrument != "UNKNOWN") {
                                          props.setInstrument(item)
@@ -341,7 +351,8 @@ export function SettignsComponent(props) {
                     <p className={"settigns-left"}>Automatically start server at startup:</p>
 
                     <input onChange={checkerAutoStartup} style={{width: "15px", height: "15px"}}
-                           className={'settings-right'} type="checkbox" name="checkbox-checked" checked={autoStartServer}/>
+                           className={'settings-right'} type="checkbox" name="checkbox-checked"
+                           checked={autoStartServer}/>
                 </div>
 
 
@@ -358,17 +369,26 @@ export function SettignsComponent(props) {
 
 
             </div>
+            <p style={{marginTop: "50px", color: "lightgray", fontSize: "small"}}>Config
+                version: {versions.version} (updated: {versions.date})</p>
+
+            <p onClick={() => {
+                loadAllAddons()
+            }}
+               style={{cursor: "pointer", textDecoration: "underline", fontSize: "small", color: "goldenrod"}}>
+                List of all supported addons in config</p>
+
             <p onClick={() => {
                 saveDebug()
-                props.showNotification("debug.tar is created. Check for app folder, and send to mcdu@kisb.top")
+                props.showNotification("Logging is now enabled, restart the ReachFMS app to create logs. Logging will only be enabled for the session starting with the next launch, it will be disabled after closing.")
             }} style={{
-                marginTop: "50px",
+                marginTop: "30px",
                 marginLeft: "auto",
                 marginRight: "auto",
                 cursor: "pointer",
                 marginBottom: "10px",
                 color: "royalblue"
-            }}>Save debug report</p>
+            }}>Enable logging for the next session</p>
             <div style={{height: "200px"}}></div>
         </div>
     )

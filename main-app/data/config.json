@@ -1,1 +1,10 @@
-{"local_ip":"http://192.168.0.22:5273","auto_hide":true,"max_fps":true,"refresh_rate":200,"cpu_displays":false,"multiple_displays":true,"auto_start":false,"calibrated":false}
+{
+  "local_ip": "http://192.168.0.22:5273",
+  "auto_hide": true,
+  "max_fps": true,
+  "refresh_rate": 200,
+  "cpu_displays": false,
+  "multiple_displays": true,
+  "auto_start": false,
+  "calibrated": false
+}

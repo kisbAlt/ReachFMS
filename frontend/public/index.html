@@ -9,11 +9,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta
             name="description"
-            content="Web site created using create-react-app"
+            content="Remote FMS for MSFS"
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png"/>
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json"/>
-    <title>Fenix remote MCDU</title>
+    <title>ReachFMS</title>
 </head>
 <body style="background-color: black; overflow: hidden">
 <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -25,33 +25,45 @@
         window.onclick = e => {
             var call_url = "http://localhost:5273";
             //var call_url = "";
-            let allowed = ["rect", "text", "g", "tspan", "path"]
+            let allowed = ["rect", "text", "g", "tspan", "path", "ellipse", "circle"]
             let parent = document.getElementById(e.target.id);
-            console.log(e.target.tagName);
+
             if (e.target.getAttribute('ascii')) {
                 //console.log(e.target.getAttribute('ascii'))
                 //fetch("http://localhost:5273" +"/mcdu_btn_press?btn="+e.target.getAttribute('ascii'))
-                if (document.getElementById("foTogBtn")) {
-                    call_url += "/mcdu_btn_press?btn=" + e.target.getAttribute('ascii') + `&usefo=${document.getElementById("foTogBtn").checked}`
-                } else {
-                    call_url += "/mcdu_btn_press?btn=" + e.target.getAttribute('ascii')
-
-                }
-                if (document.getElementById("foTogBtn") !== null) {
-                    localStorage.setItem("usefo", document.getElementById("foTogBtn").checked)
-                }
+                // if (document.getElementById("foTogBtn")) {
+                //     call_url += "/mcdu_btn_press?btn=" + e.target.getAttribute('ascii') + `&usefo=${document.getElementById("foTogBtn").checked}`
+                // } else {
+                //     call_url += "/mcdu_btn_press?btn=" + e.target.getAttribute('ascii')
+                //
+                // }
+                // if (document.getElementById("foTogBtn") !== null) {
+                //     localStorage.setItem("usefo", document.getElementById("foTogBtn").checked)
+                // }
+                call_url += "/mcdu_btn_press?btn=" + `BTN:${e.target.getAttribute('ascii')}`
 
             } else if (allowed.includes(e.target.tagName)) {
-                while (parent.getAttribute("inkscape:label") == null ||
-                !parent.getAttribute("inkscape:label").includes("BTN:")) {
+
+                while (
+                    parent != null && (
+                        parent.getAttribute("inkscape:label") == null ||
+                        (!parent.getAttribute("inkscape:label").includes("BTN:") &&
+                            !parent.getAttribute("inkscape:label").includes("RTRY:"))
+                    )) {
                     parent = parent.parentElement;
                 }
-                let btn = parent.getAttribute("inkscape:label");
-                call_url += "/mcdu_btn_press?btn=" + btn
-                console.log("BTN:", btn)
+                if (parent != null) {
+                    let btn = parent.getAttribute("inkscape:label");
+
+                    if (btn != null) {
+                        call_url += "/mcdu_btn_press?btn=" + btn.replace("RTRY", "BTN");
+                    }
+                }
             }
-        fetch(call_url)
+            fetch(call_url)
         }
     }
+
+
 </script>
 </html>

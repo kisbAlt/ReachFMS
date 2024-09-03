@@ -5,7 +5,7 @@ export function SelectFMS(props) {
     return (
         <div>
             <h1 style={{textAlign: "center"}}>ReachFMS</h1>
-            <p style={{textAlign: "center"}}>There is multiple pop out display found, please select the FMS display
+            <p style={{textAlign: "center"}}>There is multiple pop out display found, please select the instrument/FMS display
                 manually to continue.</p>
             <div style={{width: "fit-content", marginLeft: "auto", marginRight: "auto"}}>
                 {props.instrumentObjects.map((item, i) => {
@@ -26,6 +26,7 @@ export function SelectFMS(props) {
                                      }
                                  }}
                                  src={"data:image/png;base64," + _arrayBufferToBase64(item.jpeg_bytes)}/>
+                            <p style={{textAlign: "center", fontSize: "large"}}>{item.instrument}</p>
                             <p onClick={() => {
                                 setFMS(item.hwnd).then(() => {window.location.reload();})
                             }} style={{

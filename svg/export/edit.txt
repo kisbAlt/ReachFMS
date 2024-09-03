@@ -1,10 +1,12 @@
-replace:
+REPLACE:
 inkscape:label="BTN:
 
-to:
+TO:
 
 onclick="buttonPressed()" class="BTN" inkscape:label="BTN:
 
+
+ADD AT END OF <style>
 
 <style>
     .BTN > rect {
@@ -16,3 +18,16 @@ onclick="buttonPressed()" class="BTN" inkscape:label="BTN:
     }
     text {user-select: none}
 </style>
+
+
+
+
+
+REPLACE IF ROTARY:
+
+replace:
+inkscape:label="RTRY:
+
+TO:
+
+onclick="buttonPressed()" class="BTN RTRY" inkscape:label="RTRY:

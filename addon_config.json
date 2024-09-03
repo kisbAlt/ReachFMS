@@ -1,7 +1,7 @@
 {
   "aircraft_addons": [
     {
-      "title": "MICROSOFT_A310",
+      "title": "microsoft_a310",
       "display": "iniBuilds A310",
       "button_actions": [
         {
@@ -281,10 +281,14 @@
       "output_vars": [],
       "fms_aspect": 1.1145038168,
       "display_width": 268,
-      "display_top": 11
+      "display_top": 1,
+      "display_left": 0,
+      "custom_popout": [],
+      "touch_enabled": false,
+      "last_updated": "2024.08.29"
     },
     {
-      "title": "INIBUILDS-AIRCRAFT-A30",
+      "title": "inibuilds-aircraft-a30",
       "display": "iniBuilds A300",
       "button_actions": [
         {
@@ -564,10 +568,14 @@
       "output_vars": [],
       "fms_aspect": 1.1145038168,
       "display_width": 268,
-      "display_top": 11
+      "display_top": 1,
+      "display_left": 0,
+      "custom_popout": [],
+      "touch_enabled": false,
+      "last_updated": "2024.08.29"
     },
     {
-      "title": "PMDG 737-",
+      "title": "pmdg 737-",
       "display": "PMDG 737",
       "button_actions": [
         {
@@ -865,10 +873,14 @@
       ],
       "fms_aspect": 1.113,
       "display_width": 250,
-      "display_top": 43
+      "display_top": 33,
+      "display_left": 0,
+      "custom_popout": [],
+      "touch_enabled": false,
+      "last_updated": "2024.08.29"
     },
     {
-      "title": "PMDG 777-",
+      "title": "pmdg 777-",
       "display": "PMDG 777",
       "button_actions": [
         {
@@ -1152,12 +1164,16 @@
       "output_vars": [
         "(L:switch_3491_a, number) 0 >"
       ],
-      "fms_aspect": 1.2602365787,
+      "fms_aspect": 1,
       "display_width": 249,
-      "display_top": 50
+      "display_top": 14,
+      "display_left": 0,
+      "custom_popout": [],
+      "touch_enabled": false,
+      "last_updated": "2024.08.29"
     },
     {
-      "title": "INI A320",
+      "title": "microsoft-aircraft-a320neo",
       "display": "iniBuilds A320",
       "button_actions": [
         {
@@ -1434,22 +1450,1098 @@
         },
         {
           "button": "46",
-          "lvar": "INI_MCDU2_DOT"
+          "lvar": "INI_MCDU1_DECIMAL"
         },
         {
           "button": "36",
-          "lvar": "INI_MCDU1_MINUS"
+          "lvar": "INI_MCDU1_PLUS"
         }
       ],
       "svg_image": "a320.svg",
       "output_vars": [
       ],
-      "fms_aspect": 1.2602365787,
-      "display_width": 249,
-      "display_top": 50
+      "fms_aspect": 1,
+      "display_width": 560,
+      "display_top": 46,
+      "display_left": 0,
+      "custom_popout": [],
+      "touch_enabled": false,
+      "last_updated": "2024.08.29"
+    },
+    {
+      "title": "aerosoft_crj_",
+      "display": "Aerosoft CRJ",
+      "button_actions": [
+        {
+          "button": "LSK1",
+          "lvar": "ASCRJ_MCDU1_LSK1L"
+        },
+        {
+          "button": "LSK2",
+          "lvar": "ASCRJ_MCDU1_LSK2L"
+        },
+        {
+          "button": "LSK3",
+          "lvar": "ASCRJ_MCDU1_LSK3L"
+        },
+        {
+          "button": "LSK4",
+          "lvar": "ASCRJ_MCDU1_LSK4L"
+        },
+        {
+          "button": "LSK5",
+          "lvar": "ASCRJ_MCDU1_LSK5L"
+        },
+        {
+          "button": "LSK6",
+          "lvar": "ASCRJ_MCDU1_LSK6L"
+        },
+        {
+          "button": "RSK1",
+          "lvar": "ASCRJ_MCDU1_LSK1R"
+        },
+        {
+          "button": "RSK2",
+          "lvar": "ASCRJ_MCDU1_LSK2R"
+        },
+        {
+          "button": "RSK3",
+          "lvar": "ASCRJ_MCDU1_LSK3R"
+        },
+        {
+          "button": "RSK4",
+          "lvar": "ASCRJ_MCDU1_LSK4R"
+        },
+        {
+          "button": "RSK5",
+          "lvar": "ASCRJ_MCDU1_LSK5R"
+        },
+        {
+          "button": "RSK6",
+          "lvar": "ASCRJ_MCDU1_LSK6R"
+        },
+        {
+          "button": "MSG",
+          "lvar": "ASCRJ_MCDU1_MSG"
+        },
+        {
+          "button": "DIR_INTC",
+          "lvar": "ASCRJ_MCDU1_DIR_INTC"
+        },
+        {
+          "button": "FPLN",
+          "lvar": "ASCRJ_MCDU1_FPLN"
+        },
+        {
+          "button": "DEP_ARR",
+          "lvar": "ASCRJ_MCDU1_DEP_ARR"
+        },
+        {
+          "button": "HOLD",
+          "lvar": "ASCRJ_MCDU1_HOLD"
+        },
+        {
+          "button": "ARROW_UP",
+          "lvar": "ASCRJ_MCDU1_UP"
+        },
+        {
+          "button": "PREV_PAGE",
+          "lvar": "ASCRJ_MCDU1_PREV_PAGE"
+        },
+        {
+          "button": "NEXT_PAGE",
+          "lvar": "ASCRJ_MCDU1_NEXT_PAGE"
+        },
+        {
+          "button": "INDEX",
+          "lvar": "ASCRJ_MCDU1_INDEX"
+        },
+        {
+          "button": "FIX",
+          "lvar": "ASCRJ_MCDU1_FIX"
+        },
+        {
+          "button": "LEGS",
+          "lvar": "ASCRJ_MCDU1_LEGS"
+        },
+        {
+          "button": "SEC_FPLN",
+          "lvar": "ASCRJ_MCDU1_SEC_FPLN"
+        },
+        {
+          "button": "VNAV",
+          "lvar": "ASCRJ_MCDU1_VNAV"
+        },
+        {
+          "button": "ARROW_DOWN",
+          "lvar": "DOWN"
+        },
+        {
+          "button": "MCDU_MENU",
+          "lvar": "ASCRJ_MCDU1_MCDU_MENU"
+        },
+        {
+          "button": "EXEC",
+          "lvar": "ASCRJ_MCDU1_EXEC"
+        },
+        {
+          "button": "RADIO",
+          "lvar": "ASCRJ_MCDU1_RADIO"
+        },
+        {
+          "button": "PROG",
+          "lvar": "ASCRJ_MCDU1_PROG"
+        },
+        {
+          "button": "PERF",
+          "lvar": "ASCRJ_MCDU1_PERF"
+        },
+        {
+          "button": "MFD_DATA",
+          "lvar": "ASCRJ_MCDU1_MFD_DATA"
+        },
+        {
+          "button": "MFD_MENU",
+          "lvar": "ASCRJ_MCDU1_MFD_MENU"
+        },
+        {
+          "button": "MFD_ADV",
+          "lvar": "ASCRJ_MCDU1_MFD_ADV"
+        },
+        {
+          "button": "A",
+          "lvar": "ASCRJ_MCDU1_A"
+        },
+        {
+          "button": "B",
+          "lvar": "ASCRJ_MCDU1_B"
+        },
+        {
+          "button": "C",
+          "lvar": "ASCRJ_MCDU1_C"
+        },
+        {
+          "button": "D",
+          "lvar": "ASCRJ_MCDU1_D"
+        },
+        {
+          "button": "E",
+          "lvar": "ASCRJ_MCDU1_E"
+        },
+        {
+          "button": "F",
+          "lvar": "ASCRJ_MCDU1_F"
+        },
+        {
+          "button": "G",
+          "lvar": "ASCRJ_MCDU1_G"
+        },
+        {
+          "button": "H",
+          "lvar": "ASCRJ_MCDU1_H"
+        },
+        {
+          "button": "I",
+          "lvar": "ASCRJ_MCDU1_I"
+        },
+        {
+          "button": "J",
+          "lvar": "ASCRJ_MCDU1_J"
+        },
+        {
+          "button": "K",
+          "lvar": "ASCRJ_MCDU1_K"
+        },
+        {
+          "button": "L",
+          "lvar": "ASCRJ_MCDU1_L"
+        },
+        {
+          "button": "M",
+          "lvar": "ASCRJ_MCDU1_M"
+        },
+        {
+          "button": "N",
+          "lvar": "ASCRJ_MCDU1_N"
+        },
+        {
+          "button": "O",
+          "lvar": "ASCRJ_MCDU1_O"
+        },
+        {
+          "button": "P",
+          "lvar": "ASCRJ_MCDU1_P"
+        },
+        {
+          "button": "Q",
+          "lvar": "ASCRJ_MCDU1_Q"
+        },
+        {
+          "button": "R",
+          "lvar": "ASCRJ_MCDU1_R"
+        },
+        {
+          "button": "S",
+          "lvar": "ASCRJ_MCDU1_S"
+        },
+        {
+          "button": "T",
+          "lvar": "ASCRJ_MCDU1_T"
+        },
+        {
+          "button": "U",
+          "lvar": "ASCRJ_MCDU1_U"
+        },
+        {
+          "button": "V",
+          "lvar": "ASCRJ_MCDU1_V"
+        },
+        {
+          "button": "W",
+          "lvar": "ASCRJ_MCDU1_W"
+        },
+        {
+          "button": "X",
+          "lvar": "ASCRJ_MCDU1_X"
+        },
+        {
+          "button": "Y",
+          "lvar": "ASCRJ_MCDU1_Y"
+        },
+        {
+          "button": "Z",
+          "lvar": "ASCRJ_MCDU1_Z"
+        },
+        {
+          "button": "SP",
+          "lvar": "ASCRJ_MCDU1_SP"
+        },
+        {
+          "button": "DEL",
+          "lvar": "ASCRJ_MCDU1_DEL"
+        },
+        {
+          "button": "SLASH",
+          "lvar": "ASCRJ_MCDU1_SLASH"
+        },
+        {
+          "button": "CLR",
+          "lvar": "ASCRJ_MCDU1_CLR"
+        },
+        {
+          "button": "1",
+          "lvar": "ASCRJ_MCDU1_1"
+        },
+        {
+          "button": "2",
+          "lvar": "ASCRJ_MCDU1_2"
+        },
+        {
+          "button": "3",
+          "lvar": "ASCRJ_MCDU1_3"
+        },
+        {
+          "button": "4",
+          "lvar": "ASCRJ_MCDU1_4"
+        },
+        {
+          "button": "5",
+          "lvar": "ASCRJ_MCDU1_5"
+        },
+        {
+          "button": "6",
+          "lvar": "ASCRJ_MCDU1_6"
+        },
+        {
+          "button": "7",
+          "lvar": "ASCRJ_MCDU1_7"
+        },
+        {
+          "button": "8",
+          "lvar": "ASCRJ_MCDU1_8"
+        },
+        {
+          "button": "9",
+          "lvar": "ASCRJ_MCDU1_9"
+        },
+        {
+          "button": "0",
+          "lvar": "ASCRJ_MCDU1_0"
+        },
+        {
+          "button": "DOT",
+          "lvar": "ASCRJ_MCDU1_PERIOD"
+        },
+        {
+          "button": "+/-",
+          "lvar": "ASCRJ_MCDU1_PLUS"
+        }
+      ],
+      "svg_image": "crj.svg",
+      "output_vars": [
+      ],
+      "fms_aspect": 1,
+      "display_width": 259,
+      "display_top": 26,
+      "display_left": 0,
+      "custom_popout": [],
+      "touch_enabled": false,
+      "last_updated": "2024.08.29"
+    },
+    {
+      "title": "gtn750",
+      "display": "GTN750",
+      "button_actions": [
+        {
+          "button": "HOME",
+          "lvar": "1 (>H:GTN750_HomePush)"
+        },
+        {
+          "button": "DIRECT",
+          "lvar": "1 (>H:GTN750_DirectToPush)"
+        },
+        {
+          "button": "VOL",
+          "lvar": "1 (>H:GTN750_VolPush)"
+        },
+        {
+          "button": "VOL_INC",
+          "lvar": "1 (>H:GTN750_VolInc)"
+        },
+        {
+          "button": "VOL_DEC",
+          "lvar": "1 (>H:GTN750_VolDec)"
+        },
+        {
+          "button": "RSMALL",
+          "lvar": "1 (>H:GTN750_KnobPush)"
+        },
+        {
+          "button": "RSMALL_INC",
+          "lvar": "1 (>H:GTN750_KnobSmallInc)"
+        },
+        {
+          "button": "RSMALL_DEC",
+          "lvar": "1 (>H:GTN750_KnobSmallDec)"
+        },
+        {
+          "button": "RBIG_INC",
+          "lvar": "1 (>H:GTN750_KnobLargeInc)"
+        },
+        {
+          "button": "RBIG_DEC",
+          "lvar": "1 (>H:GTN750_KnobLargeDec)"
+        }
+      ],
+      "svg_image": "GTN750.svg",
+      "output_vars": [
+      ],
+      "fms_aspect": 1,
+      "display_width": 701,
+      "display_top": 38,
+      "display_left": 0,
+      "custom_popout": [
+        "GTN750_INT"
+      ],
+      "touch_enabled": true,
+      "last_updated": "2024.08.29"
+    },
+    {
+      "title": "as530",
+      "display": "GNS 530",
+      "button_actions": [
+        {
+          "button": "DIRECT",
+          "lvar": "(>H:AS530_DirectTo_Push)"
+        },
+        {
+          "button": "MENU",
+          "lvar": "(>H:AS530_MENU_Push)"
+        },
+        {
+          "button": "CLR",
+          "lvar": "(>H:AS530_CLR_Push)"
+        },
+        {
+          "button": "ENT",
+          "lvar": "(>H:AS530_ENT_Push)"
+        },
+        {
+          "button": "CDI",
+          "lvar": "(>H:AS530_CDI_Push)"
+        },
+        {
+          "button": "OBS",
+          "lvar": "(>H:AS530_OBS_Push)"
+        },
+        {
+          "button": "MSG",
+          "lvar": "(>H:AS530_MSG_Push)"
+        },
+        {
+          "button": "FPL",
+          "lvar": "(>H:AS530_FPL_Push)"
+        },
+        {
+          "button": "VNAV",
+          "lvar": "(>H:AS530_VNAV_Push)"
+        },
+        {
+          "button": "PROC",
+          "lvar": "(>H:AS530_PROC_Push)"
+        },
+        {
+          "button": "V_SWAP",
+          "lvar": "(>H:AS530_NAVSWAP_Push)"
+        },
+        {
+          "button": "C_SWAP",
+          "lvar": "(>H:AS530_COMSWAP_Push)"
+        },
+        {
+          "button": "RNG_UP",
+          "lvar": "(>H:AS530_RNG_Zoom)"
+        },
+        {
+          "button": "RNG_DN",
+          "lvar": "(>H:AS530_RNG_Dezoom)"
+        },
+        {
+          "button": "COM_VOL_INC",
+          "lvar": "(>K:COM1_VOLUME_INC)"
+        },
+        {
+          "button": "COM_VOL_DEC",
+          "lvar": "(>K:COM1_VOLUME_DEC)"
+        },
+        {
+          "button": "NAV_VOL_INC",
+          "lvar": "(>K:NAV1_VOLUME_INC)"
+        },
+        {
+          "button": "NAV_VOL_DEC",
+          "lvar": "(>K:NAV1_VOLUME_DEC)"
+        },
+        {
+          "button": "LSMALL_INC",
+          "lvar": "(>H:AS530_LeftSmallKnob_Right)"
+        },
+        {
+          "button": "LSMALL_DEC",
+          "lvar": "(>H:AS530_LeftSmallKnob_Left)"
+        },
+        {
+          "button": "LBIG_INC",
+          "lvar": "(>H:AS530_LeftLargeKnob_Right)"
+        },
+        {
+          "button": "LBIG_DEC",
+          "lvar": "(>H:AS530_LeftLargeKnob_Left)"
+        },
+        {
+          "button": "RSMALL_INC",
+          "lvar": "(>H:AS530_RightSmallKnob_Right)"
+        },
+        {
+          "button": "RSMALL_DEC",
+          "lvar": "(>H:AS530_RightSmallKnob_Left)"
+        },
+        {
+          "button": "RBIG_INC",
+          "lvar": "(>H:AS530_RightLargeKnob_Right)"
+        },
+        {
+          "button": "RBIG_DEC",
+          "lvar": "(>H:AS530_RightLargeKnob_Left)"
+        },
+        {
+          "button": "LSMALL",
+          "lvar": "(>H:AS530_LeftSmallKnob_Push)"
+        },
+        {
+          "button": "RSMALL",
+          "lvar": "(>H:AS530_RightSmallKnob_Push)"
+        }
+      ],
+      "svg_image": "GNS530.svg",
+      "output_vars": [
+      ],
+      "fms_aspect": 1,
+      "display_width": 510,
+      "display_top": -20,
+      "display_left": 0,
+      "custom_popout": [
+        "AS530"
+      ],
+      "touch_enabled": false,
+      "last_updated": "2024.08.29"
+    },
+    {
+      "title": "microsoft_atr_",
+      "display": "MICROSOFT ATR",
+      "button_actions": [
+        {
+          "button": "LSK1",
+          "lvar": "1 (>L:MSATR_MCDU1_L1) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "LSK2",
+          "lvar": "1 (>L:MSATR_MCDU1_L2) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "LSK3",
+          "lvar": "1 (>L:MSATR_MCDU1_L3) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "LSK4",
+          "lvar": "1 (>L:MSATR_MCDU1_L4) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "LSK5",
+          "lvar": "1 (>L:MSATR_MCDU1_L5) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "LSK6",
+          "lvar": "1 (>L:MSATR_MCDU1_L6) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "RSK1",
+          "lvar": "1 (>L:MSATR_MCDU1_R1) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "RSK2",
+          "lvar": "1 (>L:MSATR_MCDU1_R2) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "RSK3",
+          "lvar": "1 (>L:MSATR_MCDU1_R3) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "RSK4",
+          "lvar": "1 (>L:MSATR_MCDU1_R4) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "RSK5",
+          "lvar": "1 (>L:MSATR_MCDU1_R5) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "RSK6",
+          "lvar": "1 (>L:MSATR_MCDU1_R6) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "MENU",
+          "lvar": "1 (>L:MSATR_MCDU1_MENU) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "PREV",
+          "lvar": "1 (>L:MSATR_MCDU1_PREV) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "NEXT",
+          "lvar": "1 (>L:MSATR_MCDU1_NEXT) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "RMS",
+          "lvar": "1 (>L:MSATR_MCDU1_RMS) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "FPLN",
+          "lvar": "1 (>L:MSATR_MCDU1_FPLN) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "DTO",
+          "lvar": "1 (>L:MSATR_MCDU1_DTO) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "PERF",
+          "lvar": "1 (>L:MSATR_MCDU1_PERF) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "MSG",
+          "lvar": "1 (>L:MSATR_MCDU1_MSG) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "PROG",
+          "lvar": "1 (>L:MSATR_MCDU1_PROG) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "DATA",
+          "lvar": "1 (>L:MSATR_MCDU1_DATA) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "VNAV",
+          "lvar": "1 (>L:MSATR_MCDU1_VNAV) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "MRK",
+          "lvar": "1 (>L:MSATR_MCDU1_MRK) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "EXEC",
+          "lvar": "1 (>L:MSATR_MCDU1_EXEC) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "BRT_UP",
+          "lvar": "1 (>L:MSATR_MCDU1_BRT_UP) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "BRT_DN",
+          "lvar": "1 (>L:MSATR_MCDU1_BRT_DN) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "A",
+          "lvar": "1 (>L:MSATR_MCDU1_A) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "B",
+          "lvar": "1 (>L:MSATR_MCDU1_B) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "C",
+          "lvar": "1 (>L:MSATR_MCDU1_C) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "D",
+          "lvar": "1 (>L:MSATR_MCDU1_D) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "E",
+          "lvar": "1 (>L:MSATR_MCDU1_E) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "F",
+          "lvar": "1 (>L:MSATR_MCDU1_F) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "G",
+          "lvar": "1 (>L:MSATR_MCDU1_G) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "H",
+          "lvar": "1 (>L:MSATR_MCDU1_H) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "I",
+          "lvar": "1 (>L:MSATR_MCDU1_I) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "J",
+          "lvar": "1 (>L:MSATR_MCDU1_J) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "K",
+          "lvar": "1 (>L:MSATR_MCDU1_K) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "L",
+          "lvar": "1 (>L:MSATR_MCDU1_L) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "M",
+          "lvar": "1 (>L:MSATR_MCDU1_M) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "N",
+          "lvar": "1 (>L:MSATR_MCDU1_N) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "O",
+          "lvar": "1 (>L:MSATR_MCDU1_O) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "P",
+          "lvar": "1 (>L:MSATR_MCDU1_P) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "Q",
+          "lvar": "1 (>L:MSATR_MCDU1_Q) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "R",
+          "lvar": "1 (>L:MSATR_MCDU1_R) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "S",
+          "lvar": "1 (>L:MSATR_MCDU1_S) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "T",
+          "lvar": "1 (>L:MSATR_MCDU1_T) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "U",
+          "lvar": "1 (>L:MSATR_MCDU1_U) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "V",
+          "lvar": "1 (>L:MSATR_MCDU1_V) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "W",
+          "lvar": "1 (>L:MSATR_MCDU1_W) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "X",
+          "lvar": "1 (>L:MSATR_MCDU1_X) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "Y",
+          "lvar": "1 (>L:MSATR_MCDU1_Y) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "Z",
+          "lvar": "1 (>L:MSATR_MCDU1_Z) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "SP",
+          "lvar": "1 (>L:MSATR_MCDU1_SPACE) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "SLASH",
+          "lvar": "1 (>L:MSATR_MCDU1_SLASH) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "CLR",
+          "lvar": "1 (>L:MSATR_MCDU1_CLR) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "1",
+          "lvar": "1 (>L:MSATR_MCDU1_1) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "2",
+          "lvar": "1 (>L:MSATR_MCDU1_2) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "3",
+          "lvar": "1 (>L:MSATR_MCDU1_3) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "4",
+          "lvar": "1 (>L:MSATR_MCDU1_4) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "5",
+          "lvar": "1 (>L:MSATR_MCDU1_5) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "6",
+          "lvar": "1 (>L:MSATR_MCDU1_6) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "7",
+          "lvar": "1 (>L:MSATR_MCDU1_7) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "8",
+          "lvar": "1 (>L:MSATR_MCDU1_8) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "9",
+          "lvar": "1 (>L:MSATR_MCDU1_9) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "0",
+          "lvar": "1 (>L:MSATR_MCDU1_0) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "DOT",
+          "lvar": "1 (>L:MSATR_MCDU1_PERIOD) 1 (>L:MSATR_MCDU1_INPUT)"
+        },
+        {
+          "button": "+/-",
+          "lvar": "1 (>L:MSATR_MCDU1_PLUSMINUS) 1 (>L:MSATR_MCDU1_INPUT)"
+        }
+      ],
+      "svg_image": "ATR.svg",
+      "output_vars": [
+      ],
+      "fms_aspect": 1,
+      "display_width": 253,
+      "display_top": 28,
+      "display_left": 0,
+      "custom_popout": [],
+      "touch_enabled": false,
+      "last_updated": "2024.08.29"
+    },
+    {
+      "title": "jf_146",
+      "display": "Just Flight 146 Professional",
+      "button_actions": [
+        {
+          "button": "LSK1",
+          "lvar": "PED_FWD_L_FMS_Lsk_1L"
+        },
+        {
+          "button": "LSK2",
+          "lvar": "PED_FWD_L_FMS_Lsk_2L"
+        },
+        {
+          "button": "LSK3",
+          "lvar": "PED_FWD_L_FMS_Lsk_3L"
+        },
+        {
+          "button": "LSK4",
+          "lvar": "PED_FWD_L_FMS_Lsk_4L"
+        },
+        {
+          "button": "LSK5",
+          "lvar": "PED_FWD_L_FMS_Lsk_5L"
+        },
+        {
+          "button": "LSK6",
+          "lvar": "PED_FWD_L_FMS_Lsk_6L"
+        },
+        {
+          "button": "RSK1",
+          "lvar": "PED_FWD_L_FMS_Lsk_1R"
+        },
+        {
+          "button": "RSK2",
+          "lvar": "PED_FWD_L_FMS_Lsk_2R"
+        },
+        {
+          "button": "RSK3",
+          "lvar": "PED_FWD_L_FMS_Lsk_3R"
+        },
+        {
+          "button": "RSK4",
+          "lvar": "PED_FWD_L_FMS_Lsk_4R"
+        },
+        {
+          "button": "RSK5",
+          "lvar": "PED_FWD_L_FMS_Lsk_5R"
+        },
+        {
+          "button": "RSK6",
+          "lvar": "PED_FWD_L_FMS_Lsk_6R"
+        },
+        {
+          "button": "MSG",
+          "lvar": "PED_FWD_L_FMS_Msg"
+        },
+        {
+          "button": "DATA",
+          "lvar": "PED_FWD_L_FMS_Data"
+        },
+        {
+          "button": "FUEL",
+          "lvar": "PED_FWD_L_FMS_Fuel"
+        },
+        {
+          "button": "TUNE",
+          "lvar": "PED_FWD_L_FMS_Tune"
+        },
+        {
+          "button": "PREV",
+          "lvar": "PED_FWD_L_FMS_Prev"
+        },
+        {
+          "button": "NEXT",
+          "lvar": "PED_FWD_L_FMS_Next"
+        },
+        {
+          "button": "PWR_DIM",
+          "lvar": "PED_FWD_L_FMS_Pwr"
+        },
+        {
+          "button": "NAV",
+          "lvar": "PED_FWD_L_FMS_Nav"
+        },
+        {
+          "button": "DTO",
+          "lvar": "PED_FWD_L_FMS_Dto"
+        },
+        {
+          "button": "FPL",
+          "lvar": "PED_FWD_L_FMS_Fpl"
+        },
+        {
+          "button": "VNAV",
+          "lvar": "PED_FWD_L_FMS_Vnav"
+        },
+        {
+          "button": "LIST",
+          "lvar": "PED_FWD_L_FMS_List"
+        },
+        {
+          "button": "MENU",
+          "lvar": "PED_FWD_L_FMS_Menu"
+        },
+        {
+          "button": "PERF",
+          "lvar": "PED_FWD_L_FMS_Perf"
+        },
+        {
+          "button": "A",
+          "lvar": "PED_FWD_L_FMS_A"
+        },
+        {
+          "button": "B",
+          "lvar": "PED_FWD_L_FMS_B"
+        },
+        {
+          "button": "C",
+          "lvar": "PED_FWD_L_FMS_C"
+        },
+        {
+          "button": "D",
+          "lvar": "PED_FWD_L_FMS_D"
+        },
+        {
+          "button": "E",
+          "lvar": "PED_FWD_L_FMS_E"
+        },
+        {
+          "button": "F",
+          "lvar": "PED_FWD_L_FMS_F"
+        },
+        {
+          "button": "G",
+          "lvar": "PED_FWD_L_FMS_G"
+        },
+        {
+          "button": "H",
+          "lvar": "PED_FWD_L_FMS_H"
+        },
+        {
+          "button": "I",
+          "lvar": "PED_FWD_L_FMS_I"
+        },
+        {
+          "button": "J",
+          "lvar": "PED_FWD_L_FMS_J"
+        },
+        {
+          "button": "K",
+          "lvar": "PED_FWD_L_FMS_K"
+        },
+        {
+          "button": "L",
+          "lvar": "PED_FWD_L_FMS_L"
+        },
+        {
+          "button": "M",
+          "lvar": "PED_FWD_L_FMS_M"
+        },
+        {
+          "button": "N",
+          "lvar": "PED_FWD_L_FMS_N"
+        },
+        {
+          "button": "O",
+          "lvar": "PED_FWD_L_FMS_O"
+        },
+        {
+          "button": "P",
+          "lvar": "PED_FWD_L_FMS_P"
+        },
+        {
+          "button": "Q",
+          "lvar": "PED_FWD_L_FMS_Q"
+        },
+        {
+          "button": "R",
+          "lvar": "PED_FWD_L_FMS_R"
+        },
+        {
+          "button": "S",
+          "lvar": "PED_FWD_L_FMS_S"
+        },
+        {
+          "button": "T",
+          "lvar": "PED_FWD_L_FMS_T"
+        },
+        {
+          "button": "U",
+          "lvar": "PED_FWD_L_FMS_U"
+        },
+        {
+          "button": "V",
+          "lvar": "PED_FWD_L_FMS_V"
+        },
+        {
+          "button": "W",
+          "lvar": "PED_FWD_L_FMS_W"
+        },
+        {
+          "button": "X",
+          "lvar": "PED_FWD_L_FMS_X"
+        },
+        {
+          "button": "Y",
+          "lvar": "PED_FWD_L_FMS_Y"
+        },
+        {
+          "button": "Z",
+          "lvar": "PED_FWD_L_FMS_Z"
+        },
+        {
+          "button": "ENTER",
+          "lvar": "PED_FWD_L_FMS_Enter"
+        },
+        {
+          "button": "1",
+          "lvar": "PED_FWD_L_FMS_1"
+        },
+        {
+          "button": "2",
+          "lvar": "PED_FWD_L_FMS_2"
+        },
+        {
+          "button": "3",
+          "lvar": "PED_FWD_L_FMS_3"
+        },
+        {
+          "button": "4",
+          "lvar": "PED_FWD_L_FMS_4"
+        },
+        {
+          "button": "5",
+          "lvar": "PED_FWD_L_FMS_5"
+        },
+        {
+          "button": "6",
+          "lvar": "PED_FWD_L_FMS_6"
+        },
+        {
+          "button": "7",
+          "lvar": "PED_FWD_L_FMS_7"
+        },
+        {
+          "button": "8",
+          "lvar": "PED_FWD_L_FMS_8"
+        },
+        {
+          "button": "9",
+          "lvar": "PED_FWD_L_FMS_9"
+        },
+        {
+          "button": "0",
+          "lvar": "PED_FWD_L_FMS_0"
+        },
+        {
+          "button": "BACK",
+          "lvar": "PED_FWD_L_FMS_Back"
+        },
+        {
+          "button": "+/-",
+          "lvar": "PED_FWD_L_FMS_PlusMinus"
+        }
+      ],
+      "svg_image": "bae.svg",
+      "output_vars": [
+      ],
+      "fms_aspect": 1,
+      "display_width": 195,
+      "display_top": 10,
+      "display_left": 15,
+      "custom_popout": [],
+      "touch_enabled": false,
+      "last_updated": "2024.08.29"
     }
   ],
-  "version": 5,
-  "app_version": 0,
-  "updated": "date"
+  "version": 13,
+  "app_version": 115,
+  "updated": "2024.08.29"
 }

@@ -171,3 +171,14 @@ input:checked + .mcduslider:after
     scrollbar-width: none;  /* Firefox */
 }
 
+table, th, td {
+    border: 1px solid white;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid white;
+}
+td {
+    padding: 5px;
+}
+

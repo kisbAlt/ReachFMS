@@ -65,33 +65,17 @@ function App() {
 
     async function refreshInstruments(force = false) {
         setShowLoading(true)
-        var resp;
-        if (force) {
-            resp = await forceInstruments()
-        } else {
-            resp = await getInstruments();
-
-        }
+        var resp = await getInstruments();
 
         var local_list = []
-        console.log(resp)
         setfoundInstrumentObjects(resp)
-        var valid_istr = false;
         for (let i = 0; i < resp.length; i++) {
-            if (resp[i].instrument != "UNKNOWN") {
-                local_list.push(resp[i].instrument)
-                valid_istr = true;
-            }
+            local_list.push(resp[i].instrument)
         }
-        setFmsFound(valid_istr)
-        if (local_list.filter(x => x === "MCDU").length > 1) {
-            let message = "It seems like the display detection is not working correctly. " +
-                "Make sure that alternate renderer option below is enabled if you using it in the fenix app."
-            if (local_list.filter(x => x === "MCDU").length === 2) {
-                message += "Ignore this message if you are using both MCDU"
-            }
-            showNotification(message, true, 10)
-        }
+
+
+        setFmsFound(resp.length == 1 || resp.find(e => e.selected))
+
         setShowLoading(false)
         return resp
     }
@@ -142,6 +126,7 @@ function App() {
                 marginTop: "0"
             }}
                  className="App">
+                {/*DEBUG*/}
                 {showLoading && <LoadingComponent/>}
                 {/*{showFps && <p style={{position: "absolute"}}>{fps}FPS</p>}*/}
                 {notifMessage !== "" && (<div style={{
@@ -195,10 +180,10 @@ function App() {
                     zIndex: "10000000",
                 }}>
                     <div style={{marginLeft: '10px'}}>
-                    <img alt={"mcdu"} src={process.env.REACT_APP_LOCALHOST_PREFIX + "/icon.png"} onClick={() => {
-                        setShowFps(true)
-                    }}
-                         style={{height: "32px", marginTop: "auto", marginBottom: "auto"}}/>
+                        <img alt={"mcdu"} src={process.env.REACT_APP_LOCALHOST_PREFIX + "/icon.png"} onClick={() => {
+                            setShowFps(true)
+                        }}
+                             style={{height: "32px", marginTop: "auto", marginBottom: "auto"}}/>
                         <p style={{fontSize: "small", textAlign: "left"}}>By <a rel="noreferrer"
                                                                                 style={{
                                                                                     color: "cornflowerblue",
@@ -240,7 +225,7 @@ function App() {
                             marginRight: "5px"
                         }}></div>
                         {foundInstrumentObjects.map((item, i) => {
-                            return item.instrument == "UNKNOWN" ? ("") : (
+                            return !item.selected ? ("") : (
                                 <div key={i} onClick={() => {
                                     instrumentMenuSelectHandler(item)
                                 }} className={"menudiv"} style={{
@@ -257,21 +242,28 @@ function App() {
 
                 </div>)}
                 <div style={{overflow: "hidden", height: "100%", width: "100%"}}>
+                    {/*DEBUG*/}
+                    {/*{
+                        <McduComponent instrumentObjects={foundInstrumentObjects} fullScreenMode={fullScreenMode}
+                                       useTif={useTiff}/>
+                    }*/}
                     {
                         {
                             'Settings': (
-                                //<McduComponent fullScreenMode={fullScreenMode} useTif={useTiff}/>
+                                // <McduComponent instrumentObjects={foundInstrumentObjects} fullScreenMode={fullScreenMode} useTif={useTiff}/>
                                 <SettignsComponent
-                                                   instrumentObjects={foundInstrumentObjects}
-                                                   showNotification={showNotification} setTiff={setTiffUsage}
-                                                   setRefresh={changeRefreshRate} setInstrument={instrumentMenuSelectHandler}
-                                                   refreshFunction={() => {
-                                                       refreshInstruments(true)
-                                                   }}/>
+                                    instrumentObjects={foundInstrumentObjects}
+                                    showNotification={showNotification} setTiff={setTiffUsage}
+                                    setRefresh={changeRefreshRate} setInstrument={instrumentMenuSelectHandler}
+                                    refreshFunction={() => {
+                                        refreshInstruments(true)
+                                    }}/>
                             ),
-                            'MCDU': (<McduComponent fullScreenMode={fullScreenMode} useTif={useTiff}/>),
+                            'MCDU': (<McduComponent instrumentObjects={foundInstrumentObjects}
+                                                    fullScreenMode={fullScreenMode} useTif={useTiff}/>),
                         }[selectedInstrument] ?? (
-                            <McduComponent fullScreenMode={fullScreenMode} useTif={useTiff}/>
+                            <McduComponent instrumentObjects={foundInstrumentObjects} fullScreenMode={fullScreenMode}
+                                           useTif={useTiff}/>
 
                         )
                     }
@@ -347,7 +339,7 @@ function App() {
                           fill="#0D0C23"></path>
                 </svg>)}
             </div>
-        ) : (<SelectFMS instrumentObjects={foundInstrumentObjects} ></SelectFMS>)
+        ) : (<SelectFMS instrumentObjects={foundInstrumentObjects}></SelectFMS>)
 
     } else {
         return (
@@ -362,7 +354,6 @@ function App() {
 
         )
     }
-
 }
 
 export default App;

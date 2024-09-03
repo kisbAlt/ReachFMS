@@ -19,14 +19,14 @@ namespace SimConnector
         public async void TryConnecting()
         {
             await client.ConnectAsync(_ws_addr);
-            Console.WriteLine($"Connected: {client.Connected}");
+            SimLogger.Log($"Connected: {client.Connected}");
             Thread.Sleep(50);
             if (client.WSConnected)
             {
                 await client.SendMessageAsync("ConnectWSClient");
             }else
             {
-                Console.WriteLine("Can't connect to client...");
+                SimLogger.Log("Can't connect to client...");
             }
         }
     }
@@ -144,12 +144,13 @@ namespace SimConnector
 
             if(text == "CONNECTED")
             {
-                Console.WriteLine("RUST APP CONNECTED");
+                SimLogger.Log("RUST APP CONNECTED");
+                wasm.RefreshLVarsList();
                 this.Connected = true;
             }else if (text == "CLOSE")
             {
                 wasm.Disconnect();
-                Console.WriteLine("TERMINATING SIMCONNECTOR");
+                SimLogger.Log("TERMINATING SIMCONNECTOR");
                 Environment.Exit(0);
             } else if (text == "STATUS")
             {
@@ -166,18 +167,39 @@ namespace SimConnector
             }
             else if (text.Contains("CMD_BTN"))
             {
-                wasm.ButtonPressL(text.Split(":").ElementAt(1));
+                string cmd = text.Split(":").ElementAt(1);
+                SimLogger.Log($"LVAR BTN PRESS: {cmd}");
+                wasm.ButtonPressL(cmd);
             }
             else if (text.Contains("CUSTOM_WASM"))
             {
-                Console.WriteLine($"Sending custom WASM: {text.Replace("CUSTOM_WASM:", "")}");
+                SimLogger.Log($"Sending custom WASM: {text.Replace("CUSTOM_WASM:", "")}");
+                
                 wasm.CustomWasm(text.Replace("CUSTOM_WASM:", ""));
             }
             else if (text.Contains("GET_AIRCRAFT"))
             {
                 this.SendMessageAsync("AIRCRAFT:" + wasm.AircraftFile.ToUpper());
             }
-            Console.WriteLine($"GOT RESP:{text}");
+            else if (text.Contains("GET_VAR"))
+            {
+                string var_name = text.Replace("GET_VAR:", "");
+                SimLogger.Log("Getting variable:" + var_name);
+
+                wasm.GetSimVar(var_name, out string stringVal, out double floatVal);
+
+                SimLogger.Log("VAR stringval: " +stringVal);
+                SimLogger.Log($"VAR floatval: {floatVal}");
+
+                this.SendMessageAsync("VAR:" + stringVal);
+            }
+            else if (text.Contains("VAR_LIST"))
+            {
+                String wasm_str = wasm.GetSimVarsJson();
+                SimLogger.Log(wasm_str);
+                this.SendMessageAsync("VARS:" +wasm_str.Replace("\"", "'"));
+            }
+            SimLogger.Log($"GOT RESP:{text}");
         }
 
         public void Dispose() => DisconnectAsync().Wait();

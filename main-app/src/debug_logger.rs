@@ -1,38 +1,93 @@
+use std::ffi::CString;
+use std::fs::{OpenOptions};
 use std::sync::{Arc, Mutex};
-use std::time::Instant;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
+use crate::config_handler::get_log_file;
+use std::io::prelude::*;
+use windows::core::PCSTR;
+use windows::Win32::Foundation::HWND;
+use windows::Win32::UI::WindowsAndMessaging::{MB_ICONERROR, MB_ICONWARNING, MB_OK, MessageBoxA};
 
-#[derive(Clone)]
-pub struct DebugLogger {
-    pub log_text: Arc<Mutex<String>>,
-    pub last_written: Arc<Mutex<Instant>>
-}
-
-impl DebugLogger {
-    pub fn init() -> Self {
-        let init_var = DebugLogger {
-            log_text: Arc::new(Mutex::from("".to_string())),
-            last_written: Arc::from(Mutex::from(Instant::now()))
-        };
-        init_var
-    }
-    pub fn log(&mut self, text: &str) {
-        let current_time: DateTime<Utc> = Utc::now();
-        let log_text = format!("[{}]: {}", current_time.to_string(), text);
-        let mut old_log = self.log_text.lock().unwrap();
-        *old_log += &*(log_text + "\n");
-        
-        println!("LOG TEXT START: {} \n END", old_log);
-        drop(old_log);
-        
-        let mut last_write = self.last_written.lock().unwrap();
-        if last_write.elapsed().as_millis() > 30000  {
-            *last_write = Instant::now();
-            self.write_log();
+pub fn log(new_log: &str, log_str: &Option<Arc<Mutex<String>>>) {
+    let log_text = format!("[{}] {}\\n", Utc::now().to_string(), new_log);
+    match log_str {
+        None => {println!("{}", log_text)}
+        Some(log) => {
+            let mut old_log = log.lock().expect("Cant unwrap old_str in debug_logger");
+            
+            *old_log+= &*(log_text);
+            
+            if old_log.chars().count() > 1024 {
+                write_file(&old_log);
+                *old_log = "".to_string(); 
+            }
+            drop(old_log);
+            
         }
     }
-    
-    pub fn write_log(&self) {
-        
+}
+
+pub fn log_and_write(new_log: &str, log_str: &Option<Arc<Mutex<String>>>) {
+    let log_text = format!("[{}] {}\\n", Utc::now().to_string(), new_log);
+    match log_str {
+        None => {println!("{}", log_text)}
+        Some(log) => {
+            let mut old_log = log.lock().expect("Cant unwrap old_str in debug_logger");
+
+            *old_log+= &*(log_text);
+            write_file(&old_log);
+            *old_log = "".to_string();
+            drop(old_log);
+
+        }
     }
+}
+
+
+pub fn write_file(write_log: &String) {
+    
+    let mut f = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .append(true)
+        .open(&get_log_file()).unwrap();
+
+    write!(f, "{}", write_log).unwrap();
+    
+}
+
+pub fn clone_log(log_str: &Option<Arc<Mutex<String>>>) -> Option<Arc<Mutex<String>>>{
+    return match log_str {
+        None => { Option::None }
+        Some(cnt) => {
+            Option::from(Arc::clone(cnt))
+        }
+    }
+}
+
+pub fn show_error_dialog(message: &str) {
+    unsafe {
+        let lp_text = CString::new(message).unwrap();
+        let lp_caption = CString::new("Error while running the app...").unwrap();
+        let text_pcstr: PCSTR = PCSTR(lp_text.as_ptr() as _);
+        let caption_pcstr: PCSTR = PCSTR(lp_caption.as_ptr() as _);
+        MessageBoxA(HWND::default(), text_pcstr, caption_pcstr, MB_OK | MB_ICONERROR);
+
+    }
+}
+
+pub fn show_warning_dialog(message: &str) {
+    unsafe {
+        let lp_text = CString::new(message).unwrap();
+        let lp_caption = CString::new("Warning while running the app...").unwrap();
+        let text_pcstr: PCSTR = PCSTR(lp_text.as_ptr() as _);
+        let caption_pcstr: PCSTR = PCSTR(lp_caption.as_ptr() as _);
+        MessageBoxA(HWND::default(), text_pcstr, caption_pcstr, MB_OK | MB_ICONWARNING);
+
+    }
+}
+
+pub fn show_fatal_error(message: &str) {
+    show_error_dialog(message);
+    std::process::exit(0);
 }
