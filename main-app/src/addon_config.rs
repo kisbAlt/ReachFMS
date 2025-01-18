@@ -164,8 +164,8 @@ impl AddonConfig {
                     Err(_) => { Err(false) }
                 };
             }
-            Err(..) => {
-                debug_logger::log("Error while getting addon config from server", &log_str);
+            Err(e) => {
+                debug_logger::log(format!("Error while getting addon config from server: {}", e).as_str(), &log_str);
                 Err(false)
             }
         };
@@ -193,7 +193,7 @@ impl AddonConfig {
         Option::None
     }
 
-    pub fn get_var(&self, btn: String, aircraft_filename: String) -> &str {
+    pub fn get_var(&self, btn: String, aircraft_filename: &String) -> &str {
         return match self.get_aircraft_config(&aircraft_filename) {
             None => {
                 debug_logger::log("Cant find aircraft config for this aircraft!", &self.log_str);

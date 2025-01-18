@@ -1,0 +1,2 @@
+A lightweight, easy to use universal FMS for Microsoft Flight Simulator. You can access a remote FMS for your favorite aircrafts with just a single app.
+I always aimed for a very lightweight operation of the app throughout the development, the app should only use 0.1-1% of your CPU even on lower end systems, and if even this is still too much for you, you can always reduce the refresh rate of the FMS display stream.

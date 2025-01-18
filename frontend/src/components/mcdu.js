@@ -90,29 +90,45 @@ export function McduComponent(props) {
             ) {
                 lastTouchMoveLocation.current.changedX = 0;
                 rotate_rotary(rtryTouched.current.element, 10);
-                btnEvent(rtryTouched.current.id+"_INC")
-            }else if (lastTouchMoveLocation.current.changedX < -1*TOUCH_ROTATE_SENSITIVITY){
+                btnEvent(rtryTouched.current.id + "_INC")
+            } else if (lastTouchMoveLocation.current.changedX < -1 * TOUCH_ROTATE_SENSITIVITY) {
                 lastTouchMoveLocation.current.changedX = 0;
                 rotate_rotary(rtryTouched.current.element, -10);
-                btnEvent(rtryTouched.current.id+"_DEC")
+                btnEvent(rtryTouched.current.id + "_DEC")
             }
         }
     }
 
     function connect_socket() {
-        // "ws://localhost:5273/ws/
-        let ws_url = process.env.REACT_APP_LOCALHOST_PREFIX.replaceAll("http", "ws") +
-            `/ws/?frontend`;
+        // "ws://localhost:5273/ws
+        let curr_location = window.location.origin;
+
+        let ws_url;
+        if (process.env.REACT_APP_LOCALHOST_PREFIX != "") {
+            ws_url = process.env.REACT_APP_LOCALHOST_PREFIX.split("http").join("ws") +
+                `/ws`;
+        } else {
+            // ws_url = curr_location.split("http").join("ws") +
+            //     `/ws`;
+            ws_url = `${curr_location.replace("http", "ws")}/ws`
+        }
+
         let lwebSocket = new WebSocket(ws_url);
         let mcdu_screen = document.getElementById("streamImage");
         var urlCreator = window.URL || window.webkitURL;
+        let lastImage = null;
         lwebSocket.onmessage = function (e) {
 
+            if (lastImage != null) {
+                URL.revokeObjectURL(lastImage);
+            }
             if (typeof e.data === 'string') {
 
             } else {
-                var imageUrl = urlCreator.createObjectURL(e.data);
+                let imgBlob = new Blob([e.data], {type: 'image/png'});
+                var imageUrl = urlCreator.createObjectURL(imgBlob);
                 mcdu_screen.src = imageUrl;
+                lastImage = imageUrl
             }
         }
         var t;
@@ -128,39 +144,39 @@ export function McduComponent(props) {
     }
 
     async function loadSvg() {
+        console.log("loadsvg")
         let aircraft_config = await getAircraftConfig(props.instrumentObjects);
+        console.log(aircraft_config)
         aircraftConf.current = aircraft_config
         if (aircraft_config != null) {
             setImgWidth(aircraft_config.display_width);
             setImgTop(aircraft_config.display_top);
             setImgLeft(aircraft_config.display_left);
             // DEBUG
-            //aircraft_config.svg_image = "GTN750.svg"
+            //aircraft_config.svg_image = "GNS530.svg"
             // /DEBUG
 
             fetch(process.env.REACT_APP_LOCALHOST_PREFIX + `/static/${aircraft_config.svg_image}`)
                 .then((response) => response.text())
                 .then((data) => {
-                    document.getElementById('mcduPlacement').innerHTML = data;
+                    let mcduPlacement = document.getElementById('mcduPlacement')
+                    mcduPlacement.innerHTML = data;
                     setTimeout(() => {
-                        scaleMcdu()
+                        let mwidth = mcduPlacement.getBoundingClientRect().width;
+                        let mheight = mcduPlacement.getBoundingClientRect().height;
+                        document.getElementById("blackBack").style.width = `${mwidth}px`;
+                        document.getElementById("blackBack").style.height = `${mheight}px`;
+
+                        scaleMcdu();
+                        //loadSvg()
                     }, "50");
                 });
         }
     }
 
     useEffect(() => {
-        scaleMcdu()
-        if (localStorage.getItem("usefo") !== null) {
-            if (localStorage.getItem("usefo") === "true") {
-                //document.getElementById("foTogBtn").checked = true;
-                setTimeout(() => {
-                    document.getElementById("foTogBtn").click();
-                }, "100");
-            }
-        }
 
-        //eslint-disable-next-line
+
     }, [props.fullScreenMode]);
 
 
@@ -182,19 +198,28 @@ export function McduComponent(props) {
         let window_h = parent.getBoundingClientRect().height - 100;
         let window_aspect = window_w / window_h;
         let scale;
+        let elementToScale = document.getElementById("mcduSvg")
         if (mcdu_aspect > window_aspect) {
+            console.log(1)
             scale = Math.round((window_w / mcdu_w) * 1000) / 1000;
+            if (scale < 1) {
+                elementToScale.style.width = "fit-content";
+            }
         } else {
+            console.log(2)
             scale = Math.round((window_h / mcdu_h) * 1000) / 1000;
+            elementToScale.style.width = "100vw";
         }
-        document.getElementById("mcduSvg").style.scale = `${scale}`
+        elementToScale.style.scale = `${scale}`
 
     }
 
     function imgClicked(e) {
-        if (!aircraftConf.touch_enabled) {
+
+        if (!aircraftConf.current.touch_enabled) {
             return
         }
+
         var rect = document.getElementById("streamImage").getBoundingClientRect();
         var x = Math.round(e.clientX - rect.left); //x position within the element.
         var y = Math.round(e.clientY - rect.top);  //y position within the element.
@@ -304,46 +329,38 @@ export function McduComponent(props) {
         return 0;
     }
 
+
     return (
         <div id={"mcduParent"} style={{height: "100%", width: "100%", position: "relative", overflow: "hidden"}}>
-            {/*<div style={{*/}
-            {/*    scale: "0.6",*/}
-            {/*    position: "absolute",*/}
-            {/*    zIndex: "10000",*/}
-            {/*    top: "-8px",*/}
-            {/*    left: "0",*/}
-            {/*    right: "0",*/}
-            {/*    marginLeft: "auto",*/}
-            {/*    marginRight: "auto",*/}
-            {/*}}>*/}
-            {/*    <McduSideToggleSwitch/>*/}
-            {/*</div>*/}
-            <div style={{}} id={"mcduSvg"}>
-                <div style={{
-                    position: "absolute",
-                    zIndex: "5",
-                    left: "0px",
-                    right: "0px",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                    width: "fit-content",
-                }} onClick={imgClicked}
-                     id={"mcduPlacement"}>
 
-                </div>
-                <div id={"blackBack"} style={{
-                    position: "fixed", left: "0", right: "0",
-                    marginLeft: "auto", marginRight: "auto"
-                }}>
+            <div style={{width: "fit-content", height: "fit-content"}} id={"mcduSvg"}>
 
-                    <img onClick={imgClicked} style={{
-                        position: "absolute", width: `${imgWidth}px`, left: "0", right: "0", marginLeft: "auto",
-                        marginRight: "auto", marginTop: `${imgTop}px`, paddingLeft: `${imgLeft}px`,
-                        border: "10px solid black"
-                    }}
-                         id={"streamImage"}
-                         alt={"streamImage"}/>
-                </div>
+                    <div style={{
+                        position: "absolute",
+                        zIndex: "5",
+                        left: "0px",
+                        right: "0px",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                        width: "fit-content",
+                    }} onClick={imgClicked}
+                         id={"mcduPlacement"}>
+
+                    </div>
+                    <div id={"blackBack"} style={{
+                        position: "fixed", left: "0", right: "0",
+                        marginLeft: "auto", marginRight: "auto", overflow: "hidden"
+                    }}>
+
+                        <img onClick={imgClicked} style={{
+                            position: "absolute", width: `${imgWidth}px`, left: "0", right: "0", marginLeft: "auto",
+                            marginRight: "auto", marginTop: `${imgTop}px`, paddingLeft: `${imgLeft}px`,
+                            border: "10px solid black"
+                        }}
+                             id={"streamImage"}
+                             alt={"Image Stream loading..."}/>
+                    </div>
+
             </div>
         </div>
     );

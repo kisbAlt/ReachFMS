@@ -13,6 +13,8 @@ pub fn log(new_log: &str, log_str: &Option<Arc<Mutex<String>>>) {
     match log_str {
         None => {println!("{}", log_text)}
         Some(log) => {
+            // DEBUG
+            println!("{}", log_text);
             let mut old_log = log.lock().expect("Cant unwrap old_str in debug_logger");
             
             *old_log+= &*(log_text);

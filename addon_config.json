@@ -1164,7 +1164,7 @@
       "output_vars": [
         "(L:switch_3491_a, number) 0 >"
       ],
-      "fms_aspect": 1,
+      "fms_aspect": 1.0,
       "display_width": 249,
       "display_top": 14,
       "display_left": 0,
@@ -1458,9 +1458,8 @@
         }
       ],
       "svg_image": "a320.svg",
-      "output_vars": [
-      ],
-      "fms_aspect": 1,
+      "output_vars": [],
+      "fms_aspect": 1.0,
       "display_width": 560,
       "display_top": 46,
       "display_left": 0,
@@ -1778,9 +1777,8 @@
         }
       ],
       "svg_image": "crj.svg",
-      "output_vars": [
-      ],
-      "fms_aspect": 1,
+      "output_vars": [],
+      "fms_aspect": 1.0,
       "display_width": 259,
       "display_top": 26,
       "display_left": 0,
@@ -1834,9 +1832,8 @@
         }
       ],
       "svg_image": "GTN750.svg",
-      "output_vars": [
-      ],
-      "fms_aspect": 1,
+      "output_vars": [],
+      "fms_aspect": 1.0,
       "display_width": 701,
       "display_top": 38,
       "display_left": 0,
@@ -1964,9 +1961,8 @@
         }
       ],
       "svg_image": "GNS530.svg",
-      "output_vars": [
-      ],
-      "fms_aspect": 1,
+      "output_vars": [],
+      "fms_aspect": 1.0,
       "display_width": 510,
       "display_top": -20,
       "display_left": 0,
@@ -2254,9 +2250,8 @@
         }
       ],
       "svg_image": "ATR.svg",
-      "output_vars": [
-      ],
-      "fms_aspect": 1,
+      "output_vars": [],
+      "fms_aspect": 1.0,
       "display_width": 253,
       "display_top": 28,
       "display_left": 0,
@@ -2530,18 +2525,611 @@
         }
       ],
       "svg_image": "bae.svg",
-      "output_vars": [
-      ],
-      "fms_aspect": 1,
+      "output_vars": [],
+      "fms_aspect": 1.0,
       "display_width": 195,
       "display_top": 10,
       "display_left": 15,
       "custom_popout": [],
       "touch_enabled": false,
       "last_updated": "2024.08.29"
+    },
+    {
+      "title": "cj4",
+      "display": "Cessna Citation CJ4",
+      "button_actions": [
+        {
+          "button": "LSK1",
+          "lvar": "(>H:CJ4_FMC_1_BTN_L1)"
+        },
+        {
+          "button": "LSK2",
+          "lvar": "(>H:CJ4_FMC_1_BTN_L2)"
+        },
+        {
+          "button": "LSK3",
+          "lvar": "(>H:CJ4_FMC_1_BTN_L3)"
+        },
+        {
+          "button": "LSK4",
+          "lvar": "(>H:CJ4_FMC_1_BTN_L4)"
+        },
+        {
+          "button": "LSK5",
+          "lvar": "(>H:CJ4_FMC_1_BTN_L5)"
+        },
+        {
+          "button": "LSK6",
+          "lvar": "(>H:CJ4_FMC_1_BTN_L6)"
+        },
+        {
+          "button": "RSK1",
+          "lvar": "(>H:CJ4_FMC_1_BTN_R1)"
+        },
+        {
+          "button": "RSK2",
+          "lvar": "(>H:CJ4_FMC_1_BTN_R2)"
+        },
+        {
+          "button": "RSK3",
+          "lvar": "(>H:CJ4_FMC_1_BTN_R3)"
+        },
+        {
+          "button": "RSK4",
+          "lvar": "(>H:CJ4_FMC_1_BTN_R4)"
+        },
+        {
+          "button": "RSK5",
+          "lvar": "(>H:CJ4_FMC_1_BTN_R5)"
+        },
+        {
+          "button": "RSK6",
+          "lvar": "(>H:CJ4_FMC_1_BTN_R6)"
+        },
+        {
+          "button": "MSG",
+          "lvar": "(>H:CJ4_FMC_1_BTN_MSG)"
+        },
+        {
+          "button": "DIR",
+          "lvar": "(>H:CJ4_FMC_1_BTN_DIR)"
+        },
+        {
+          "button": "IDX",
+          "lvar": "(>H:CJ4_FMC_1_BTN_IDX)"
+        },
+        {
+          "button": "TUN",
+          "lvar": "(>H:CJ4_FMC_1_BTN_TUN)"
+        },
+        {
+          "button": "FPLN",
+          "lvar": "(>H:CJ4_FMC_1_BTN_FPLN)"
+        },
+        {
+          "button": "LEGS",
+          "lvar": "(>H:CJ4_FMC_1_BTN_LEGS)"
+        },
+        {
+          "button": "DEP_ARR",
+          "lvar": "(>H:CJ4_FMC_1_BTN_DEPARR)"
+        },
+        {
+          "button": "PERF",
+          "lvar": "(>H:CJ4_FMC_1_BTN_PERF)"
+        },
+        {
+          "button": "DISPL_MENU",
+          "lvar": "(>H:CJ4_FMC_1_BTN_DSPL_MENU)"
+        },
+        {
+          "button": "MFD_ADV",
+          "lvar": "(>H:CJ4_FMC_1_BTN_MFD_ADV)"
+        },
+        {
+          "button": "MFD_DATA",
+          "lvar": "(>H:CJ4_FMC_1_BTN_MFD_DATA)"
+        },
+        {
+          "button": "PREV",
+          "lvar": "(>H:CJ4_FMC_1_BTN_PREVPAGE)"
+        },
+        {
+          "button": "EXEC",
+          "lvar": "(>H:CJ4_FMC_1_BTN_EXEC)"
+        },
+        {
+          "button": "NEXT",
+          "lvar": "(>H:CJ4_FMC_1_BTN_NEXT)"
+        },
+        {
+          "button": "CLR_DEL",
+          "lvar": "(>H:CJ4_FMC_1_BTN_CLR)"
+        },
+        {
+          "button": "BRT_UP",
+          "lvar": "(>H:CJ4_FMC_1_BTN_BRT)"
+        },
+        {
+          "button": "BRT_DIM",
+          "lvar": "(>H:CJ4_FMC_1_BTN_BRT)"
+        },
+        {
+          "button": "A",
+          "lvar": "(>H:CJ4_FMC_1_BTN_A)"
+        },
+        {
+          "button": "B",
+          "lvar": "(>H:CJ4_FMC_1_BTN_B)"
+        },
+        {
+          "button": "C",
+          "lvar": "(>H:CJ4_FMC_1_BTN_C)"
+        },
+        {
+          "button": "D",
+          "lvar": "(>H:CJ4_FMC_1_BTN_D)"
+        },
+        {
+          "button": "E",
+          "lvar": "(>H:CJ4_FMC_1_BTN_E)"
+        },
+        {
+          "button": "F",
+          "lvar": "(>H:CJ4_FMC_1_BTN_F)"
+        },
+        {
+          "button": "G",
+          "lvar": "(>H:CJ4_FMC_1_BTN_G)"
+        },
+        {
+          "button": "H",
+          "lvar": "(>H:CJ4_FMC_1_BTN_H)"
+        },
+        {
+          "button": "I",
+          "lvar": "(>H:CJ4_FMC_1_BTN_I)"
+        },
+        {
+          "button": "J",
+          "lvar": "(>H:CJ4_FMC_1_BTN_J)"
+        },
+        {
+          "button": "K",
+          "lvar": "(>H:CJ4_FMC_1_BTN_K)"
+        },
+        {
+          "button": "L",
+          "lvar": "(>H:CJ4_FMC_1_BTN_L)"
+        },
+        {
+          "button": "M",
+          "lvar": "(>H:CJ4_FMC_1_BTN_M)"
+        },
+        {
+          "button": "N",
+          "lvar": "(>H:CJ4_FMC_1_BTN_N)"
+        },
+        {
+          "button": "O",
+          "lvar": "(>H:CJ4_FMC_1_BTN_O)"
+        },
+        {
+          "button": "P",
+          "lvar": "(>H:CJ4_FMC_1_BTN_P)"
+        },
+        {
+          "button": "Q",
+          "lvar": "(>H:CJ4_FMC_1_BTN_Q)"
+        },
+        {
+          "button": "R",
+          "lvar": "(>H:CJ4_FMC_1_BTN_R)"
+        },
+        {
+          "button": "S",
+          "lvar": "(>H:CJ4_FMC_1_BTN_S)"
+        },
+        {
+          "button": "T",
+          "lvar": "(>H:CJ4_FMC_1_BTN_T)"
+        },
+        {
+          "button": "U",
+          "lvar": "(>H:CJ4_FMC_1_BTN_U)"
+        },
+        {
+          "button": "V",
+          "lvar": "(>H:CJ4_FMC_1_BTN_V)"
+        },
+        {
+          "button": "W",
+          "lvar": "(>H:CJ4_FMC_1_BTN_W)"
+        },
+        {
+          "button": "X",
+          "lvar": "(>H:CJ4_FMC_1_BTN_X)"
+        },
+        {
+          "button": "Y",
+          "lvar": "(>H:CJ4_FMC_1_BTN_Y)"
+        },
+        {
+          "button": "Z",
+          "lvar": "(>H:CJ4_FMC_1_BTN_Z)"
+        },
+        {
+          "button": "SP",
+          "lvar": "(>H:CJ4_FMC_1_BTN_SP)"
+        },
+        {
+          "button": "SLASH",
+          "lvar": "(>H:CJ4_FMC_1_BTN_DIV)"
+        },
+        {
+          "button": "1",
+          "lvar": "(>H:CJ4_FMC_1_BTN_1)"
+        },
+        {
+          "button": "2",
+          "lvar": "(>H:CJ4_FMC_1_BTN_2)"
+        },
+        {
+          "button": "3",
+          "lvar": "(>H:CJ4_FMC_1_BTN_3)"
+        },
+        {
+          "button": "4",
+          "lvar": "(>H:CJ4_FMC_1_BTN_4)"
+        },
+        {
+          "button": "5",
+          "lvar": "(>H:CJ4_FMC_1_BTN_5)"
+        },
+        {
+          "button": "6",
+          "lvar": "(>H:CJ4_FMC_1_BTN_6)"
+        },
+        {
+          "button": "7",
+          "lvar": "(>H:CJ4_FMC_1_BTN_7)"
+        },
+        {
+          "button": "8",
+          "lvar": "(>H:CJ4_FMC_1_BTN_8)"
+        },
+        {
+          "button": "9",
+          "lvar": "(>H:CJ4_FMC_1_BTN_9)"
+        },
+        {
+          "button": "0",
+          "lvar": "(>H:CJ4_FMC_1_BTN_0)"
+        },
+        {
+          "button": "DOT",
+          "lvar": "(>H:CJ4_FMC_1_BTN_DOT)"
+        },
+        {
+          "button": "+/-",
+          "lvar": "(>H:CJ4_FMC_1_BTN_PLUSMINUS)"
+        }
+      ],
+      "svg_image": "CJ4.svg",
+      "output_vars": [],
+      "fms_aspect": 1.0,
+      "display_width": 210,
+      "display_top": 10,
+      "display_left": 0,
+      "custom_popout": [],
+      "touch_enabled": false,
+      "last_updated": "2025.01.17"
+    },
+    {
+      "title": "jf_rj_",
+      "display": "Just Flight Avro RJ",
+      "button_actions": [
+        {
+          "button": "LSK1",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_1L)"
+        },
+        {
+          "button": "LSK2",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_2L)"
+        },
+        {
+          "button": "LSK3",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_3L)"
+        },
+        {
+          "button": "LSK4",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_4L)"
+        },
+        {
+          "button": "LSK5",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_5L)"
+        },
+        {
+          "button": "LSK6",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_6L)"
+        },
+        {
+          "button": "RSK1",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_1R)"
+        },
+        {
+          "button": "RSK2",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_2R)"
+        },
+        {
+          "button": "RSK3",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_3R)"
+        },
+        {
+          "button": "RSK4",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_4R)"
+        },
+        {
+          "button": "RSK5",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_5R)"
+        },
+        {
+          "button": "RSK6",
+          "lvar": "1 (>L:GNLU910_L_FMS_Lsk_6R)"
+        },
+        {
+          "button": "INIT_REF",
+          "lvar": "1 (>L:GNLU910_L_FMS_InitRef)"
+        },
+        {
+          "button": "RTE",
+          "lvar": "1 (>L:GNLU910_L_FMS_Rte)"
+        },
+        {
+          "button": "LEGS",
+          "lvar": "1 (>L:GNLU910_L_FMS_Legs)"
+        },
+        {
+          "button": "DEP_ARR",
+          "lvar": "1 (>L:GNLU910_L_FMS_DepArr)"
+        },
+        {
+          "button": "VNAV",
+          "lvar": "1 (>L:GNLU910_L_FMS_Vnav)"
+        },
+        {
+          "button": "LEGS",
+          "lvar": "1 (>L:GNLU910_L_FMS_LEGS)"
+        },
+        {
+          "button": "DEP_ARR",
+          "lvar": "1 (>L:GNLU910_L_FMS_DEPARR)"
+        },
+        {
+          "button": "VNAV",
+          "lvar": "1 (>L:GNLU910_L_FMS_Vnav)"
+        },
+        {
+          "button": "HOLD",
+          "lvar": "1 (>L:GNLU910_L_FMS_Hold)"
+        },
+        {
+          "button": "MENU",
+          "lvar": "1 (>L:GNLU910_L_FMS_Menu)"
+        },
+        {
+          "button": "CLR",
+          "lvar": "1 (>L:GNLU910_L_FMS_Clr)"
+        },
+        {
+          "button": "DEL",
+          "lvar": "1 (>L:GNLU910_L_FMS_Del)"
+        },
+        {
+          "button": "SP",
+          "lvar": "1 (>L:GNLU910_L_FMS_Sp)"
+        },
+        {
+          "button": "FIX",
+          "lvar": "1 (>L:GNLU910_L_FMS_Fix)"
+        },
+        {
+          "button": "NAV_RAD",
+          "lvar": "1 (>L:GNLU910_L_FMS_NavRad)"
+        },
+        {
+          "button": "PROG",
+          "lvar": "1 (>L:GNLU910_L_FMS_Prog)"
+        },
+        {
+          "button": "EXEC",
+          "lvar": "1 (>L:GNLU910_L_FMS_Exec)"
+        },
+        {
+          "button": "ATC",
+          "lvar": "1 (>L:GNLU910_L_FMS_Atc)"
+        },
+        {
+          "button": "PRV",
+          "lvar": "(>L:GNLU910_L_FMS_PrvNxt) (>L:PED_FWD_L_FMS_Prev)"
+        },
+        {
+          "button": "NXT",
+          "lvar": "2  (>L:GNLU910_L_FMS_PrvNxt) (>L:PED_FWD_L_FMS_Next)"
+        },
+        {
+          "button": "A",
+          "lvar": "1 (>L:GNLU910_L_FMS_A)"
+        },
+        {
+          "button": "B",
+          "lvar": "1 (>L:GNLU910_L_FMS_B)"
+        },
+        {
+          "button": "C",
+          "lvar": "1 (>L:GNLU910_L_FMS_C)"
+        },
+        {
+          "button": "D",
+          "lvar": "1 (>L:GNLU910_L_FMS_D)"
+        },
+        {
+          "button": "E",
+          "lvar": "1 (>L:GNLU910_L_FMS_E)"
+        },
+        {
+          "button": "F",
+          "lvar": "1 (>L:GNLU910_L_FMS_F)"
+        },
+        {
+          "button": "G",
+          "lvar": "1 (>L:GNLU910_L_FMS_G)"
+        },
+        {
+          "button": "H",
+          "lvar": "1 (>L:GNLU910_L_FMS_H)"
+        },
+        {
+          "button": "I",
+          "lvar": "1 (>L:GNLU910_L_FMS_I)"
+        },
+        {
+          "button": "J",
+          "lvar": "1 (>L:GNLU910_L_FMS_J)"
+        },
+        {
+          "button": "K",
+          "lvar": "1 (>L:GNLU910_L_FMS_K)"
+        },
+        {
+          "button": "L",
+          "lvar": "1 (>L:GNLU910_L_FMS_L)"
+        },
+        {
+          "button": "M",
+          "lvar": "1 (>L:GNLU910_L_FMS_M)"
+        },
+        {
+          "button": "N",
+          "lvar": "1 (>L:GNLU910_L_FMS_N)"
+        },
+        {
+          "button": "O",
+          "lvar": "1 (>L:GNLU910_L_FMS_O)"
+        },
+        {
+          "button": "P",
+          "lvar": "1 (>L:GNLU910_L_FMS_P)"
+        },
+        {
+          "button": "Q",
+          "lvar": "1 (>L:GNLU910_L_FMS_Q)"
+        },
+        {
+          "button": "R",
+          "lvar": "1 (>L:GNLU910_L_FMS_R)"
+        },
+        {
+          "button": "S",
+          "lvar": "1 (>L:GNLU910_L_FMS_S)"
+        },
+        {
+          "button": "T",
+          "lvar": "1 (>L:GNLU910_L_FMS_T)"
+        },
+        {
+          "button": "U",
+          "lvar": "1 (>L:GNLU910_L_FMS_U)"
+        },
+        {
+          "button": "V",
+          "lvar": "1 (>L:GNLU910_L_FMS_V)"
+        },
+        {
+          "button": "W",
+          "lvar": "1 (>L:GNLU910_L_FMS_W)"
+        },
+        {
+          "button": "X",
+          "lvar": "1 (>L:GNLU910_L_FMS_X)"
+        },
+        {
+          "button": "Y",
+          "lvar": "1 (>L:GNLU910_L_FMS_Y)"
+        },
+        {
+          "button": "Z",
+          "lvar": "1 (>L:GNLU910_L_FMS_Z)"
+        },
+        {
+          "button": "SP",
+          "lvar": "1 (>L:GNLU910_L_FMS_SP)"
+        },
+        {
+          "button": "SLASH",
+          "lvar": "1 (>L:GNLU910_L_FMS_DIV)"
+        },
+        {
+          "button": "1",
+          "lvar": "1 (>L:GNLU910_L_FMS_1)"
+        },
+        {
+          "button": "2",
+          "lvar": "1 (>L:GNLU910_L_FMS_2)"
+        },
+        {
+          "button": "3",
+          "lvar": "1 (>L:GNLU910_L_FMS_3)"
+        },
+        {
+          "button": "4",
+          "lvar": "1 (>L:GNLU910_L_FMS_4)"
+        },
+        {
+          "button": "5",
+          "lvar": "1 (>L:GNLU910_L_FMS_5)"
+        },
+        {
+          "button": "6",
+          "lvar": "1 (>L:GNLU910_L_FMS_6)"
+        },
+        {
+          "button": "7",
+          "lvar": "1 (>L:GNLU910_L_FMS_7)"
+        },
+        {
+          "button": "8",
+          "lvar": "1 (>L:GNLU910_L_FMS_8)"
+        },
+        {
+          "button": "9",
+          "lvar": "1 (>L:GNLU910_L_FMS_9)"
+        },
+        {
+          "button": "0",
+          "lvar": "1 (>L:GNLU910_L_FMS_0)"
+        },
+        {
+          "button": "DOT",
+          "lvar": "1 (>L:GNLU910_L_FMS_DOT)"
+        },
+        {
+          "button": "+/-",
+          "lvar": "1 (>L:GNLU910_L_FMS_PLUSMINUS)"
+        }
+      ],
+      "svg_image": "RJ.svg",
+      "output_vars": [],
+      "fms_aspect": 1.0,
+      "display_width": 255,
+      "display_top": 35,
+      "display_left": 12,
+      "custom_popout": [],
+      "touch_enabled": false,
+      "last_updated": "2025.01.18"
     }
   ],
-  "version": 13,
+  "version": 14,
   "app_version": 115,
-  "updated": "2024.08.29"
+  "updated": "2025.01.17"
 }

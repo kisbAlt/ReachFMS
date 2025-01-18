@@ -7,7 +7,7 @@ namespace SimConnector
     internal class SocketCom
     {
         WsClient client;
-        const string _ws_addr = "ws://localhost:5273/ws/";
+        const string _ws_addr = "ws://localhost:5273/ws";
         public SocketCom()
         {
             WasmConnect wasm = new WasmConnect();

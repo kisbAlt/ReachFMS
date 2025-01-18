@@ -134,6 +134,7 @@ export function SettignsComponent(props) {
         setBridgeConnected(status.bridge_status.connected)
 
         let aircraft_config = await getAircraftConfig(props.instrumentObjects);
+        console.log(aircraft_config)
         if (aircraft_config != null) {
             setVersions({"version": aircraft_config.version, "date": aircraft_config.updated})
             if ("display" in aircraft_config) {

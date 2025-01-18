@@ -23,7 +23,11 @@
 <script>
     function buttonPressed() {
         window.onclick = e => {
-            var call_url = "http://localhost:5273";
+            var call_url = window.location.origin;
+            if (call_url.includes("3000")) {
+                call_url = call_url.replace("3000", "5273")
+            }
+
             //var call_url = "";
             let allowed = ["rect", "text", "g", "tspan", "path", "ellipse", "circle"]
             let parent = document.getElementById(e.target.id);

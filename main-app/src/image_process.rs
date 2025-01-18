@@ -1,13 +1,12 @@
 use std::{mem};
+use std::sync::{Arc, Mutex};
+use fltk::draw::width;
 use image::{RgbaImage};
 use win_screenshot::prelude::*;
 use serde::{Deserialize, Serialize};
 use windows::Win32::Foundation::{HWND, RECT};
-use windows::Win32::UI::WindowsAndMessaging::{GetSystemMetrics, GetWindow, GetWindowRect, GW_OWNER, 
-                                              SetWindowPos, SM_CYVIRTUALSCREEN, SWP_NOACTIVATE, 
-                                              SWP_NOREDRAW, SWP_NOZORDER};
-
-
+use windows::Win32::UI::WindowsAndMessaging::{GetSystemMetrics, GetWindow, GetWindowRect, GW_OWNER, SetWindowPos, SM_CYVIRTUALSCREEN, SWP_NOACTIVATE, SWP_NOREDRAW, SWP_NOZORDER};
+use crate::debug_logger;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct InstrumentRgb {
@@ -54,43 +53,62 @@ pub const POPOUT_HEIGHT: i32 = 700;
 
 pub struct ImageProcess {}
 
+pub struct WindowCapture {
+    pub buf: Vec<u8>,
+    pub width: u16,
+    pub height: u16
+}
+
+
+
+
 impl ImageProcess {
     // pub fn init() -> Self {
     //     Self {}
     // }
     pub fn start(auto_hide: Option<bool>,
-                 selected_hwnd: Option<isize>,
+                 selected_hwnd: Option<isize>, log_str: &Option<Arc<Mutex<String>>>
     ) -> Vec<InstrumentRgb> {
         let mut rgb_list: Vec<InstrumentRgb> = Vec::new();
         let av_hw = match ImageProcess::find_popup_windows() {
-            Ok(res) => {res}
+            Ok(res) => {
+                debug_logger::log(format!("Found pop-outs: {}", 
+                                          serde_json::to_string(&res).unwrap()).as_str(), &log_str);
+                res
+            }
             Err(_) => {
+                debug_logger::log("Can't find MSFS window! Found window handles:", &log_str);
+                let ls = window_list().unwrap();
+                for ls_c in ls {
+                    debug_logger::log(format!("HWND: {}, TITLE: '{}'",
+                                              &ls_c.hwnd, &ls_c.window_name).as_str(), &log_str);
+                }
                 //show_warning_dialog("Cant find MSFS window!");
                 vec![]
             }
         };
-        
+
         if av_hw.len() == 0 {
-            return rgb_list; 
+            return rgb_list;
         }
 
 
         for hw in av_hw.iter() {
-            let buf2 = ImageProcess::capture_instrument(
-                hw.hwnd.clone(), [[0, 0], [0, 0]]);
+            let capture = ImageProcess::capture_instrument(
+                hw.hwnd.clone(), [[0, 0], [0, 0]]).unwrap();
 
 
-            let buf = capture_window_ex(hw.hwnd.clone(), Using::PrintWindow,
-                                        Area::ClientOnly, None, None).unwrap();
-            let img = RgbaImage::from_raw(buf.width, buf.height, buf.pixels).unwrap();
+            // let buf = capture_window_ex(hw.hwnd.clone(), Using::PrintWindow,
+            //                             Area::ClientOnly, None, None).unwrap();
+            // let img = RgbaImage::from_raw(buf.width, buf.height, buf.pixels).unwrap();
 
             let current = InstrumentRgb {
                 hwnd: hw.hwnd.clone(),
-                height: img.height() as u16,
-                width: img.width() as u16,
-                crop: ImageProcess::find_crop_for_instruments(img.width(), img.height()),
+                height: capture.height,
+                width: capture.width,
+                crop: ImageProcess::find_crop_for_instruments(capture.width as u32, capture.height as u32),
                 instrument: hw.title.clone(),
-                jpeg_bytes: buf2.unwrap(),
+                jpeg_bytes: capture.buf,
                 auto_hide: true,
                 excluded: false,
                 selected: false,
@@ -109,7 +127,8 @@ impl ImageProcess {
                     }
                     for rgb in &mut rgb_list {
                         if rgb.hwnd == hw {
-                            //rgb.instrument = "MCDU".parse().unwrap();
+                            debug_logger::log(format!("Setting selected hwnd: {}",
+                                                      &rgb.hwnd).as_str(), &log_str);
                             if rgb.instrument == UNKNOWN_TITLE {
                                 rgb.instrument = MCDU_TITLE.to_string();
                             }
@@ -154,6 +173,7 @@ impl ImageProcess {
         }
     }
 
+
     pub fn get_window_parent(hwnd: isize) -> HWND {
         unsafe {
             let hwnda_to_move: HWND = mem::transmute(hwnd);
@@ -180,6 +200,7 @@ impl ImageProcess {
     }
 
     pub fn get_sim_hwnd(window_ls: &Vec<HwndName>) -> isize {
+        //let mut current_hwnd: HWND;
         for i in window_ls {
             if i.window_name.contains(MSFS_TITLE) {
                 return i.hwnd;
@@ -187,15 +208,16 @@ impl ImageProcess {
         }
         return 0;
     }
-    
+
+
     pub fn find_popup_windows() -> Result<Vec<PopOutWindow>, bool> {
         let mut process_ls = Vec::<PopOutWindow>::new();
         let ls = window_list().unwrap();
         let fs_hwnd = Self::get_sim_hwnd(&ls);
         if fs_hwnd == 0 {
-            return Err(false)
+            return Err(false);
         }
-        
+
         for i in ls {
             let prnt_id = Self::get_window_parent(i.hwnd);
 
@@ -210,7 +232,7 @@ impl ImageProcess {
                 })
             }
         }
-        return Ok(process_ls)
+        return Ok(process_ls);
     }
     pub fn window_to_string(input: &Vec<InstrumentRgb>) -> String {
         let mut string_instruments: Vec<InstrumentResponse> = Vec::new();
@@ -224,14 +246,14 @@ impl ImageProcess {
                 auto_hide: i.auto_hide,
                 excluded: i.excluded,
                 jpeg_bytes: i.jpeg_bytes.clone(),
-                selected: i.selected
+                selected: i.selected,
             })
         }
         return serde_json::to_string(&string_instruments).unwrap();
     }
 
 
-    pub fn capture_instrument(hw_id: isize, crop: [[i32; 2]; 2]) -> Result<Vec<u8>, u8> {
+    pub fn capture_instrument(hw_id: isize, crop: [[i32; 2]; 2]) -> Result<WindowCapture, u8> {
         let cropxy: Option<[i32; 2]> = match crop[0] {
             [0, 0] => Option::None,
             _ => { Option::from(crop[0]) }
@@ -260,12 +282,17 @@ impl ImageProcess {
 
             writer.write_image_data(&buf.pixels).unwrap(); // Save
         }
-        Ok(outputbuf)
+        let capture = WindowCapture{
+            buf: outputbuf,
+            width: buf.width as u16,
+            height: buf.height as u16
+        };
+        Ok(capture)
     }
 
     pub fn restore_all() -> bool {
         let poputs = match ImageProcess::find_popup_windows() {
-            Ok(res) => {res}
+            Ok(res) => { res }
             Err(_) => {
                 return false
             }
@@ -273,12 +300,12 @@ impl ImageProcess {
         for popout in poputs {
             unsafe { ImageProcess::move_window(popout.hwnd, 0, 0, POPOUT_WIDTH, POPOUT_HEIGHT) }
         }
-        return true
+        return true;
     }
 
     pub fn hide_all() -> bool {
         let poputs = match ImageProcess::find_popup_windows() {
-            Ok(res) => {res}
+            Ok(res) => { res }
             Err(_) => {
                 return false
             }
@@ -286,6 +313,6 @@ impl ImageProcess {
         for popout in poputs {
             unsafe { Self::hide_window(popout.hwnd) }
         }
-        return true
+        return true;
     }
 }

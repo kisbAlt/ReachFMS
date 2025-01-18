@@ -243,62 +243,6 @@ async fn save_debug(data: web::Data<AppState>) -> impl Responder {
     conf.log_enabled = true;
     conf.write_config();
     drop(conf);
-    // if std::path::Path::new("debug").exists() {
-    //     fs::remove_dir_all("debug").unwrap();
-    // }
-    // fs::create_dir("debug").unwrap();
-    // 
-    // if std::path::Path::new("debug.tar").exists() {
-    //     fs::remove_file("debug.tar").unwrap()
-    // }
-    // let file = File::create("debug.tar").unwrap();
-    // let mut a = tar::Builder::new(file);
-    // 
-    // 
-    // let mut brid_status = data.bridge_status.lock().unwrap().clone();
-    // comm_sender::get_status(&mut brid_status, data.command_sender.clone(), data.comm_receiver.clone());
-    // let temp_status: String = serde_json::to_string(&brid_status).unwrap_or("".to_string());
-    // drop(brid_status);
-    // 
-    // 
-    // let conf = data.config.lock().unwrap();
-    // let temp_instr = ImageProcess::start(Option::None, Option::None);
-    // let debug: DebugSave = DebugSave {
-    //     instrument_list: ImageProcess::window_to_string(&temp_instr),
-    //     config: conf.get_string(),
-    //     status: temp_status,
-    // };
-    // drop(conf);
-    // 
-    // File::create("debug/debug.json")
-    //     .expect("Error encountered while creating file!");
-    // let json_string = serde_json::to_string(&debug).unwrap();
-    // fs::write("debug/debug.json", json_string).expect("Unable to write file");
-    // a.append_path("debug/debug.json").unwrap();
-    // 
-    // if std::path::Path::new("data/samples").exists() {
-    //     let sample_paths = fs::read_dir("data/samples").unwrap();
-    //     for path in sample_paths {
-    //         a.append_path(path.unwrap().path()).expect("Cant append sample!");
-    //     }
-    // }
-    // 
-    // for instr in temp_instr.iter() {
-    //     let buf = capture_window_ex(instr.hwnd, Using::PrintWindow,
-    //                                 Area::ClientOnly, None, None).unwrap();
-    //     let img = RgbaImage::from_raw(buf.width, buf.height, buf.pixels).unwrap();
-    //     img.save(format!("debug/{}_{}.jpg", instr.instrument, instr.hwnd)).unwrap();
-    //     a.append_path(format!("debug/{}_{}.jpg", instr.instrument, instr.hwnd)).unwrap();
-    // }
-    // 
-    // if std::path::Path::new("WASimClient.log").exists() {
-    //     a.append_path("WASimClient.log").unwrap();
-    // }
-    // 
-    // if std::path::Path::new("debug").exists() {
-    //     fs::remove_dir_all("debug").unwrap();
-    // }
-
     HttpResponse::Ok().body("log enabled")
 }
 
@@ -328,10 +272,11 @@ async fn mcdu_btn(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
     let instr = data.img_sub_status.instrument_search.lock().unwrap().clone();
 
     if instr.is_empty() {}
-
-    let aircraft_var = data.addon_config.get_var(btn_id.replace("BTN:", ""), instr);
+    
+    let aircraft_var = data.addon_config.get_var(btn_id.replace("BTN:", ""), &instr);
 
     if aircraft_var == "" {
+        debug_logger::log(&*format!("PLANE INSTRUMENT/FILE:: {}", &instr), &data.log_str);
         debug_logger::log(&*format!("Cant find lvar for: {}", &btn_id), &data.log_str);
         return HttpResponse::Ok().body("Cant find lvar");
     }
@@ -397,6 +342,11 @@ async fn touch_event(req: HttpRequest, data: web::Data<AppState>) -> HttpRespons
                 let sy = GetSystemMetrics(SM_CYSCREEN);
                 let move_x = window_rect.left + x_pos as i32;
                 let move_y = window_rect.top + y_pos as i32;
+
+                if click_point.x > sx || click_point.y > sy {
+                    return HttpResponse::Ok().body("error: auto_hide enabled!");
+                }
+
                 let absolute_x = click_point.x * 65536 / sx;
                 let absolute_y = click_point.y * 65536 / sy;
                 debug_logger::log(&*format!("WNDOW POS: x:{} y:{}", &window_rect.left, &window_rect.top), &data.log_str);
@@ -446,7 +396,7 @@ async fn restore_windows() -> HttpResponse {
 
 #[get("/hide_windows")]
 async fn hide_popout_windows(data: web::Data<AppState>) -> HttpResponse {
-    let hw = data.img_sub_status.selected_hwnd.lock().unwrap();
+    drop(data.img_sub_status.selected_hwnd.lock().expect("Can't hide windows!"));
     ImageProcess::hide_all();
 
     HttpResponse::Ok().body("ok")
@@ -467,13 +417,14 @@ async fn get_windows(data: web::Data<AppState>) -> HttpResponse {
     drop(saved);
     let sub_hwnd = data.img_sub_status.selected_hwnd.lock().unwrap().clone();
     let wndows = ImageProcess::start(Option::from(conf.auto_hide),
-                                     Option::from(sub_hwnd));
+                                     Option::from(sub_hwnd), &data.log_str);
     let resp = ImageProcess::window_to_string(&wndows);
     for img in &wndows {
         if img.instrument == "MCDU" || popout_lst.contains(&img.instrument) || wndows.len() == 1 {
             let mut instr_search = data.img_sub_status.instrument_search.lock().unwrap();
             if img.instrument != crate::image_process::UNKNOWN_TITLE &&
-                img.instrument != crate::image_process::MCDU_TITLE{
+                img.instrument != crate::image_process::MCDU_TITLE &&
+                data.addon_config.get_aircraft_config(&img.instrument).is_some() {
                 *instr_search = img.instrument.clone();
             } else {
                 *instr_search = aircraft.clone();
@@ -563,20 +514,21 @@ async fn set_hwnd(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
     let hw_id = qs.get("hwnd").unwrap_or("0")
         .parse::<isize>().unwrap_or(0);
 
-    let wndows = ImageProcess::start(Option::from(conf.auto_hide), Option::from(hw_id));
+    let wndows = ImageProcess::start(Option::from(conf.auto_hide), Option::from(hw_id),
+                                     &data.log_str);
 
 
     for img in &wndows {
         if img.hwnd == hw_id {
             let mut instr_search = data.img_sub_status.instrument_search.lock().unwrap();
             if img.instrument != crate::image_process::UNKNOWN_TITLE &&
-                img.instrument != crate::image_process::MCDU_TITLE{
+                img.instrument != crate::image_process::MCDU_TITLE {
                 *instr_search = img.instrument.clone();
             } else {
                 *instr_search = aircraft.clone();
             }
             drop(instr_search);
-            
+
             let mut sub_hwnd = data.img_sub_status.selected_hwnd.lock().unwrap();
             *sub_hwnd = img.hwnd;
             let find_crop = data.addon_config.calculate_crop(&aircraft,
@@ -585,8 +537,8 @@ async fn set_hwnd(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
             *crop = find_crop;
             let mut state_instruments = data.instrument_list.lock().unwrap();
             *state_instruments = wndows;
-            
-            
+
+
             return HttpResponse::Ok()
                 .body("ok");
         }
@@ -694,7 +646,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
                         let crop = Arc::clone(&self.img_crop);
                         let inner_log = debug_logger::clone_log(&self.log_str);
                         thread::spawn(move || {
-                            let mut refresh = cnfig_inner.lock().unwrap().refresh_rate.clone();
+                            let mut refresh = std::time::Duration::from_millis(cnfig_inner.lock().unwrap().refresh_rate.clone() as u64);
                             let mut inner_subs = Arc::clone(&sbs).lock().unwrap().clone();
                             let mut inner_hwnd = Arc::clone(&hwnd).lock().unwrap().clone();
                             let mut inner_crop = Arc::clone(&crop).lock().unwrap().clone();
@@ -702,14 +654,14 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
                             let mut counter = 500;
                             loop {
                                 if counter % 10 == 0 {
-                                    refresh = cnfig_inner.lock().unwrap().refresh_rate.clone();
+                                    refresh = std::time::Duration::from_millis(cnfig_inner.lock().unwrap().refresh_rate.clone() as u64);
                                     let current_subs = Arc::clone(&sbs);
                                     let mut subs_locked = current_subs.lock().unwrap();
                                     let mut i = 0;
                                     while i < subs_locked.len() {
                                         if !subs_locked[i].connected() {
                                             debug_logger::log("Removing a subscriber from img thread",
-                                                &inner_log);
+                                                              &inner_log);
                                             subs_locked.remove(i);
                                         } else {
                                             i += 1;
@@ -723,32 +675,27 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
                                     let img =
                                         match ImageProcess::capture_instrument(
                                             inner_hwnd, inner_crop) {
-                                            Ok(res) => {res}
+                                            Ok(res) => { res.buf }
                                             Err(e) => {
-                                                debug_logger::log(
-                                                    format!("Cant capture instrument!: {}", e).as_str(),
-                                                    &inner_log);
+                                                println!("Cant capture instrument!:{}", e);
                                                 vec![]
                                             }
                                         };
 
-                                    for i in 0..inner_subs.len() {
-                                        if inner_hwnd != 0 && img.len() > 0 {
+                                    if inner_hwnd != 0 && img.len() > 0 {
+                                        for i in 0..inner_subs.len() {
                                             match inner_subs[i].try_send(BinaryMessage(img.clone())) {
-                                                Ok(_) => {},
+                                                Ok(_) => {}
                                                 Err(e) => {
                                                     debug_logger::log(
                                                         format!("Cant send img from sub thread: {}", e).as_str(),
                                                         &inner_log);
-                                                    
-                                                    
-                                                },
+                                                }
                                             }
-
                                         }
                                     }
                                 }
-                                thread::sleep(std::time::Duration::from_millis(refresh as u64));
+                                thread::sleep(refresh);
                                 counter += 1;
                             }
                         });
@@ -850,7 +797,7 @@ pub async fn main(log_str: Option<Arc<Mutex<String>>>) -> std::io::Result<()> {
             .service(get_simvar)
             .service(touch_event)
             .service(Files::new("/static", static_path.clone()))
-            .route("/ws/", web::get().to(ws_index))
+            .route("/ws", web::get().to(ws_index))
         //.service(jpeg_test)
     })
         .bind(("0.0.0.0", 5273))?

@@ -145,6 +145,10 @@ pub fn get_simconnector_exe() -> String {
     return get_file_in_exe_folder(vec![SIMCONNECTOR_RELATIVE_DIR, "SimConnector.exe"])
 }
 
+pub fn get_simconnector_folder() -> String {
+    return get_file_in_exe_folder(vec![SIMCONNECTOR_RELATIVE_DIR])
+}
+
 pub fn get_config_file() -> String {
     return get_file_in_exe_folder(vec!["data", "config.json"])
 }
