@@ -4,7 +4,7 @@ path = "src/main.rs"
 
 [package]
 name = "reachfms"
-version = "0.1.15"
+version = "0.1.17"
 edition = "2021"
 build = "build.rs"
 authors = ["kisbAlt"]
@@ -35,7 +35,8 @@ zip = "2.1.3"
 
 [dependencies.windows]
 version = "0.57"
-features = ["Win32_Foundation", "Win32_UI_WindowsAndMessaging", "Win32_System_SystemServices", "Win32_UI_Input_KeyboardAndMouse"]
+features = ["Win32_Foundation", "Win32_UI_WindowsAndMessaging", "Win32_System_SystemServices",
+    "Win32_UI_Input_KeyboardAndMouse", "Win32_System_ProcessStatus"]
 
 [build-dependencies]
 winres = "0.1"
