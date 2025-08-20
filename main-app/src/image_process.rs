@@ -42,7 +42,7 @@ pub struct PopOutWindow {
 
 const USING: Using = Using::PrintWindow;
 const AREA: Area = Area::ClientOnly;
-const MSFS_TITLE: &str = "Microsoft Flight Simulator - ";
+const MSFS_TITLE: &str = "Microsoft Flight Simulator";
 const DEFAULT_TITLE: &str = "WASMINSTRUMENT";
 pub(crate) const UNKNOWN_TITLE: &str = "UNKNOWN";
 pub(crate) const MCDU_TITLE: &str = "FMS";
@@ -204,6 +204,8 @@ impl ImageProcess {
         for i in window_ls {
             if i.window_name.contains(MSFS_TITLE) {
                 return i.hwnd;
+            }else {
+                println!("window: {}", i.window_name);
             }
         }
         return 0;
