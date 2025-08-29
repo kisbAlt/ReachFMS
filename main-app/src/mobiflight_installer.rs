@@ -35,10 +35,49 @@ pub fn get_community_folder() -> Result<String, bool> {
     return Err(false);
 }
 
+pub fn get_2024_community_folder() -> Result<String, bool> {
+    #[cfg(windows)]
+    let mut file_path = std::env::var("APPDATA").expect("No APP_DATA1 directory") + "\\Microsoft Flight Simulator 2024\\UserCfg.opt";
+
+
+    if !std::path::Path::new(&file_path).exists() {
+        file_path = std::env::var("LOCALAPPDATA").expect("No APP_DATA1 directory")
+            + "\\Packages\\Microsoft.Limitless_8wekyb3d8bbwe\\LocalCache\\UserCfg.opt";
+        if !std::path::Path::new(&file_path).exists() {
+            show_fatal_error("Can't find your community folder!");
+            return Err(false);
+        }
+    }
+
+    let content = fs::read_to_string(&file_path)
+        .expect("Cant read config file");
+
+    for line in content.lines() {
+        if line.contains("InstalledPackagesPath") {
+            let community_path = line.split("\"").collect::<Vec<&str>>()[1].to_string()
+                + "\\Community";
+            return Ok(community_path);
+        }
+    }
+    show_fatal_error("Can't find your community folder!");
+    return Err(false);
+}
+
 pub fn mobiflight_installed() -> bool {
+    mobiflight_2020_installed() && mobiflight_2024_installed()
+    
+}
+
+fn mobiflight_2020_installed() -> bool {
     let community_folder = get_community_folder().unwrap();
     std::path::Path::new(&(community_folder.to_owned() + "\\mobiflight-event-module")).exists()
-    
+
+}
+
+fn mobiflight_2024_installed() -> bool {
+    let community_2024_folder = get_2024_community_folder().unwrap();
+    std::path::Path::new(&(community_2024_folder.to_owned() + "\\mobiflight-event-module")).exists()
+
 }
 
 
@@ -80,39 +119,56 @@ pub fn download_package() {
 }
 
 fn extract_mobi(zip_file: &String) {
-    let community_path = PathBuf::from(get_community_folder().unwrap());
+    let mut community_path;
     let fname = std::path::Path::new(&zip_file);
     let file = fs::File::open(fname).unwrap();
 
     let mut archive = zip::ZipArchive::new(file).unwrap();
 
-    for i in 0..archive.len() {
-        let mut file = archive.by_index(i).unwrap();
-        let outpath = match file.enclosed_name() {
-            Some(path) => {
-                let new_path = community_path.join(path);
-                new_path
-            },
-            None => continue,
-        };
-
-        {
-            let comment = file.comment();
-            if !comment.is_empty() {
+    for v in 0..2 {
+        if (v == 0) {
+            // install mobi to msfs2020 if not installed already
+            if(mobiflight_2020_installed()){
+                continue;
             }
+            community_path = PathBuf::from(get_community_folder().unwrap());
+        }else {
+            // install mobi to msfs2024 if not installed already
+            if(mobiflight_2024_installed()){
+                continue;
+            }
+            community_path = PathBuf::from(get_2024_community_folder().unwrap());
         }
 
-        if file.is_dir() {
-            fs::create_dir_all(&outpath).unwrap();
-        } else {
-            if let Some(p) = outpath.parent() {
-                if !p.exists() {
-                    fs::create_dir_all(p).unwrap();
+        for i in 0..archive.len() {
+            let mut file = archive.by_index(i).unwrap();
+            let outpath = match file.enclosed_name() {
+                Some(path) => {
+                    let new_path = community_path.join(path);
+                    new_path
+                },
+                None => continue,
+            };
+
+            {
+                let comment = file.comment();
+                if !comment.is_empty() {
                 }
             }
-            let mut outfile = fs::File::create(&outpath).unwrap();
-            io::copy(&mut file, &mut outfile).unwrap();
+
+            if file.is_dir() {
+                fs::create_dir_all(&outpath).unwrap();
+            } else {
+                if let Some(p) = outpath.parent() {
+                    if !p.exists() {
+                        fs::create_dir_all(p).unwrap();
+                    }
+                }
+                let mut outfile = fs::File::create(&outpath).unwrap();
+                io::copy(&mut file, &mut outfile).unwrap();
+            }
         }
     }
+
 
 }
