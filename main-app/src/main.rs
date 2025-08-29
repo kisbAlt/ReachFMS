@@ -354,7 +354,7 @@ impl McduApp {
             mobi_text.set_label_font(Font::HelveticaBold);
 
 
-            if mobiflight_installer::mobiflight_installed() {
+            if mobiflight_installer::mobiflight_installed(&true) {
                 mobi_text.set_label("It seems like that you have the mobiflight wasm module installed. \n The mobiflight wasm module is needed for the app to function properly. \n If you installed the module a while ago consider updating it.")
             } else {
                 mobi_text.set_label("It seems like that you don't have mobiflight installed.\n The mobiflight wasm module is needed for the app to function properly.\n You can install the event_module manually,\n\
@@ -506,7 +506,7 @@ impl McduApp {
                     }
                     Message::Continue => {
                         if !self.mobi_text.visible() && self.instructions.visible() {
-                            if !mobiflight_installer::mobiflight_installed() {
+                            if !mobiflight_installer::mobiflight_installed(&false) {
                                 self.continue_button.hide();
                                 self.install_automatically.show();
                                 self.install_manually.show();
@@ -515,7 +515,7 @@ impl McduApp {
                             self.mobi_text.show();
                             self.first_welcome_text.set_label("ReachFMS Setup");
                         } else if self.continue_button.label().contains("Check") {
-                            if !mobiflight_installer::mobiflight_installed() {
+                            if !mobiflight_installer::mobiflight_installed(&false) {
                                 self.mobi_text.set_label("It seems like the wasm module is still not installed. \n Did you extract the zip file to your Community folder? \n\n Please try again!");
                             } else {
                                 self.first_window.hide();
