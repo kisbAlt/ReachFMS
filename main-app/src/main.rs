@@ -353,7 +353,6 @@ impl McduApp {
             mobi_text.set_label_color(Color::White);
             mobi_text.set_label_font(Font::HelveticaBold);
 
-
             if mobiflight_installer::mobiflight_installed(&true) {
                 mobi_text.set_label("It seems like that you have the mobiflight wasm module installed. \n The mobiflight wasm module is needed for the app to function properly. \n If you installed the module a while ago consider updating it.")
             } else {

@@ -26,14 +26,14 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:export-bgcolor="#ffffff00"
      inkscape:zoom="2.2474972"
-     inkscape:cx="125.4729"
-     inkscape:cy="276.97476"
+     inkscape:cx="127.92007"
+     inkscape:cy="232.03588"
      inkscape:window-width="2560"
      inkscape:window-height="1369"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="a4db6d90-98fb-42cb-ba4b-f97352c94fad"
+     inkscape:current-layer="b07b45a8-3984-4953-8be6-7aae973856de"
      inkscape:document-units="mm" /><defs
      id="defs186"><radialGradient
        id="e65f7926-a27b-485a-ab99-2ea8d5323c25"
@@ -3139,10 +3139,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect313" /></g></g><polygon
-           points="715.05,211.28 721.55,207.52 721.55,215.03 721.55,222.54 715.05,218.79 708.55,215.03 "
-           fill="#ffffff"
-           id="polygon314" /></g><g
+               id="rect313" /></g></g><path
+           id="polygon314"
+           style="fill:#ffffff"
+           d="m 715.05,211.28 6.5,-3.76 v 7.51 7.51 l -6.5,-3.75 -6.5,-3.76 z" /></g><g
          id="b1d04945-b807-41ac-a2e2-83f0010ea1d8"
          data-name="BTN:LSK2R"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:LSK2R"><use
@@ -3173,10 +3173,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect315" /></g></g><polygon
-           points="715.05,272.75 721.55,268.99 721.55,276.5 721.55,284.01 715.05,280.25 708.55,276.5 "
-           fill="#ffffff"
-           id="polygon316" /></g><g
+               id="rect315" /></g></g><path
+           id="polygon316"
+           style="fill:#ffffff"
+           d="m 715.05,272.75 6.5,-3.76 v 7.51 7.51 l -6.5,-3.76 -6.5,-3.75 z" /></g><g
          id="b6dd04a8-f95d-4471-a344-cfed0fe96454"
          data-name="BTN:LSK3R"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:LSK3R"><image
@@ -3209,10 +3209,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect317" /></g></g><polygon
-           points="715.05,335.48 721.55,331.72 721.55,339.23 721.55,346.74 715.05,342.99 708.55,339.23 "
-           fill="#ffffff"
-           id="polygon318" /></g><g
+               id="rect317" /></g></g><path
+           id="polygon318"
+           style="fill:#ffffff"
+           d="m 715.05,335.48 6.5,-3.76 v 7.51 7.51 l -6.5,-3.75 -6.5,-3.76 z" /></g><g
          id="b7da440c-7adf-45f9-af7d-dae2dabebc72"
          data-name="BTN:LSK4R"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:LSK4R"><use
@@ -3243,10 +3243,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect319" /></g></g><polygon
-           points="715.05,398.21 721.55,394.46 721.55,401.97 721.55,409.48 715.05,405.72 708.55,401.97 "
-           fill="#ffffff"
-           id="polygon320" /></g><g
+               id="rect319" /></g></g><path
+           id="polygon320"
+           style="fill:#ffffff"
+           d="m 715.05,398.21 6.5,-3.75 v 7.51 7.51 l -6.5,-3.76 -6.5,-3.75 z" /></g><g
          id="a6e1cd81-6079-49f1-b14b-6aa43b3643db"
          data-name="BTN:LSK5R"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:LSK5R"><use
@@ -3277,10 +3277,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect321" /></g></g><polygon
-           points="715.05,460.95 721.55,457.19 721.55,464.7 721.55,472.21 715.05,468.45 708.55,464.7 "
-           fill="#ffffff"
-           id="polygon322" /></g><g
+               id="rect321" /></g></g><path
+           id="polygon322"
+           style="fill:#ffffff"
+           d="m 715.05,460.95 6.5,-3.76 v 7.51 7.51 l -6.5,-3.76 -6.5,-3.75 z" /></g><g
          id="adaf7e79-5834-40d1-9c24-20407a0e93b0"
          data-name="BTN:LSK6R"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:LSK6R"><image
@@ -3313,10 +3313,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect323" /></g></g><polygon
-           points="715.05,527.64 721.55,523.89 721.55,531.39 721.55,538.9 715.05,535.15 708.55,531.39 "
-           fill="#ffffff"
-           id="polygon324" /></g><g
+               id="rect323" /></g></g><path
+           id="polygon324"
+           style="fill:#ffffff"
+           d="m 715.05,527.64 6.5,-3.75 v 7.5 7.51 l -6.5,-3.75 -6.5,-3.76 z" /></g><g
          id="b0fa32f3-1de0-49bd-aca4-04448e103769"
          data-name="BTN:LSK1L"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:LSK1L"><use
@@ -3347,10 +3347,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect325" /></g></g><polygon
-           points="60.29,211.28 53.78,207.52 53.78,215.03 53.78,222.54 60.29,218.79 66.79,215.03 "
-           fill="#ffffff"
-           id="polygon326" /></g><g
+               id="rect325" /></g></g><path
+           id="polygon326"
+           style="fill:#ffffff"
+           d="m 60.29,211.28 -6.51,-3.76 v 7.51 7.51 l 6.51,-3.75 6.5,-3.76 z" /></g><g
          id="ac428071-7e51-4c70-9545-0216145a2387"
          data-name="BTN:LSK2L"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:LSK2L"><image
@@ -3383,10 +3383,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect327" /></g></g><polygon
-           points="60.29,272.75 53.78,268.99 53.78,276.5 53.78,284.01 60.29,280.25 66.79,276.5 "
-           fill="#ffffff"
-           id="polygon328" /></g><g
+               id="rect327" /></g></g><path
+           id="polygon328"
+           style="fill:#ffffff"
+           d="m 60.29,272.75 -6.51,-3.76 v 7.51 7.51 l 6.51,-3.76 6.5,-3.75 z" /></g><g
          id="afe7ce9a-6b58-4b00-b8c8-1844f1d6fbd5"
          data-name="BTN:LSK3L"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:LSK3L"><image
@@ -3419,10 +3419,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect329" /></g></g><polygon
-           points="60.29,335.48 53.78,331.72 53.78,339.23 53.78,346.74 60.29,342.99 66.79,339.23 "
-           fill="#ffffff"
-           id="polygon330" /></g><g
+               id="rect329" /></g></g><path
+           id="polygon330"
+           style="fill:#ffffff"
+           d="m 60.29,335.48 -6.51,-3.76 v 7.51 7.51 l 6.51,-3.75 6.5,-3.76 z" /></g><g
          id="a63bc163-ea7a-4650-b4b0-f9330f9a8309"
          data-name="BTN:LSK4L"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:LSK4L"><image
@@ -3455,10 +3455,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect331" /></g></g><polygon
-           points="60.29,398.21 53.78,394.46 53.78,401.97 53.78,409.48 60.29,405.72 66.79,401.97 "
-           fill="#ffffff"
-           id="polygon332" /></g><g
+               id="rect331" /></g></g><path
+           id="polygon332"
+           style="fill:#ffffff"
+           d="m 60.29,398.21 -6.51,-3.75 v 7.51 7.51 l 6.51,-3.76 6.5,-3.75 z" /></g><g
          id="a4c6de10-be07-455d-a5aa-5ba95acdaff5"
          data-name="BTN:LSK5L"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:LSK5L"><use
@@ -3489,10 +3489,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect333" /></g></g><polygon
-           points="60.29,460.95 53.78,457.19 53.78,464.7 53.78,472.21 60.29,468.45 66.79,464.7 "
-           fill="#ffffff"
-           id="polygon334" /></g><g
+               id="rect333" /></g></g><path
+           id="polygon334"
+           style="fill:#ffffff"
+           d="m 60.29,460.95 -6.51,-3.76 v 7.51 7.51 l 6.51,-3.76 6.5,-3.75 z" /></g><g
          id="be52746e-c887-457e-b429-89dc5135deb5"
          data-name="BTN:LSK6L"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:LSK6L"><image
@@ -3525,10 +3525,10 @@
                width="55.900002"
                height="38.790001"
                rx="2"
-               id="rect335" /></g></g><polygon
-           points="60.29,527.64 53.78,523.89 53.78,531.39 53.78,538.9 60.29,535.15 66.79,531.39 "
-           fill="#ffffff"
-           id="polygon336" /></g><g
+               id="rect335" /></g></g><path
+           id="polygon336"
+           style="fill:#ffffff"
+           d="m 60.29,527.64 -6.51,-3.75 v 7.5 7.51 l 6.51,-3.75 6.5,-3.76 z" /></g><g
          id="a20b5f96-d90e-4e98-804d-b924b108d089"
          data-name="BTN:1"
          onclick="buttonPressed()" class="BTN" inkscape:label="BTN:1"><image
@@ -4825,8 +4825,8 @@
            transform="translate(2.01)"
            fill="#ffffff"
            id="path473" /></g></g></g>
-
-<style>
+		   
+		   <style>
     .BTN > rect {
         cursor: pointer
 
@@ -4836,4 +4836,4 @@
     }
     text {user-select: none}
 </style>
-</svg>
+		   </svg>

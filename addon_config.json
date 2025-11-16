@@ -2252,12 +2252,12 @@
       "svg_image": "ATR_2.svg",
       "output_vars": [],
       "fms_aspect": 1.0,
-      "display_width": 238,
+      "display_width": 235,
       "display_top": 38,
       "display_left": 0,
       "custom_popout": [],
       "touch_enabled": false,
-      "last_updated": "2025.08.29"
+      "last_updated": "2025.09.2."
     },
     {
       "title": "jf_146",
@@ -3114,7 +3114,7 @@
       "display_left": 20,
       "custom_popout": [],
       "touch_enabled": false,
-      "last_updated": "2025.08.29"
+      "last_updated": "2025.09.02."
     },
     {
       "title": "microsoft-a321",
@@ -3412,7 +3412,7 @@
       "last_updated": "2025.08.29"
     }
   ],
-  "version": 19,
+  "version": 20,
   "app_version": 118,
-  "updated": "2025.08.29"
+  "updated": "2025.09.02."
 }

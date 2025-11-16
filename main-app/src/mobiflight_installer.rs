@@ -61,7 +61,7 @@ pub fn mobiflight_installed(show_msg: &bool) -> bool {
     mobiflight_2020_installed(&show_msg) && mobiflight_2024_installed(&show_msg)
 }
 
-fn mobiflight_2020_installed(show_msg: &bool) -> bool {
+pub fn mobiflight_2020_installed(show_msg: &bool) -> bool {
     match get_community_folder() {
         Ok(community_2020_folder) => {
             std::path::Path::new(&(community_2020_folder.to_owned() + "\\mobiflight-event-module"))
@@ -71,12 +71,12 @@ fn mobiflight_2020_installed(show_msg: &bool) -> bool {
             if *show_msg {
                 show_warning_dialog("Can't find your MSFS2020 community folder! If you don't have it installed ignore this message. Otherwise install the mobiflight wasm module manually!");
             }
-            false
+            true
         }
     }
 }
 
-fn mobiflight_2024_installed(show_msg: &bool) -> bool {
+pub fn mobiflight_2024_installed(show_msg: &bool) -> bool {
     match get_2024_community_folder() {
         Ok(community_2024_folder) => {
             std::path::Path::new(&(community_2024_folder.to_owned() + "\\mobiflight-event-module"))
@@ -86,7 +86,7 @@ fn mobiflight_2024_installed(show_msg: &bool) -> bool {
             if *show_msg {
                 show_warning_dialog("Can't find your MSFS2024 community folder! If you don't have it installed ignore this message. Otherwise install the mobiflight wasm module manually!");
             }
-            false
+            true
         }
     }
 }
