@@ -1,3 +1,11 @@
+ILLUSTRATOR:
+REPLACE:
+id="BTN:
+
+TO:
+
+onclick="buttonPressed()" class="BTN" inkscape:label="BTN:
+
 REPLACE:
 inkscape:label="BTN:
 
